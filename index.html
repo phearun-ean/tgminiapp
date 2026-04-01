@@ -1,0 +1,923 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bird Nest House - Order Now!</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #ff6b00;
+            --primary-dark: #e65100;
+            --secondary: #4caf50;
+            --danger: #f44336;
+            --dark: #333;
+            --light: #f8f9fa;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--tg-theme-bg-color, #ffffff);
+            color: var(--tg-theme-text-color, #333);
+            min-height: 100vh;
+            padding-bottom: 80px;
+        }
+
+        /* Header Styles */
+        .header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            border-radius: 0 0 30px 30px;
+            box-shadow: 0 4px 15px rgba(255, 107, 0, 0.3);
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 5px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .header p {
+            font-size: 1rem;
+            opacity: 0.95;
+            margin-bottom: 15px;
+        }
+
+        .user-info {
+            background: rgba(255,255,255,0.2);
+            padding: 10px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
+
+        /* Tabs Navigation */
+        .tabs {
+            display: flex;
+            background: var(--tg-theme-secondary-bg-color, #f5f5f5);
+            padding: 5px;
+            border-radius: 30px;
+            margin: 15px;
+            gap: 5px;
+        }
+
+        .tab {
+            flex: 1;
+            text-align: center;
+            padding: 12px;
+            border-radius: 25px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .tab.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        /* Content Sections */
+        .section {
+            display: none;
+            padding: 15px;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        /* Menu Items Grid */
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 15px;
+            margin-top: 10px;
+        }
+
+        .menu-item {
+            background: var(--tg-theme-secondary-bg-color, #f9f9f9);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            transition: transform 0.3s;
+        }
+
+        .menu-item:hover {
+            transform: translateY(-3px);
+        }
+
+        .item-image {
+            width: 100%;
+            height: 160px;
+            background: linear-gradient(45deg, #ffdab9, #ffe4b5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+        }
+
+        .item-details {
+            padding: 15px;
+        }
+
+        .item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .item-name {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .item-price {
+            color: var(--primary);
+            font-weight: 700;
+            font-size: 1.3rem;
+        }
+
+        .item-description {
+            color: var(--tg-theme-hint-color, #666);
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+        }
+
+        .item-controls {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .quantity-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: white;
+            border-radius: 25px;
+            padding: 5px;
+        }
+
+        .qty-btn {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            border: none;
+            background: var(--primary);
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .qty-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .qty-value {
+            font-weight: 600;
+            min-width: 20px;
+            text-align: center;
+        }
+        .add-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .add-btn:hover {
+            background: var(--primary-dark);
+        }
+
+        /* Cart Styles */
+        .cart-item {
+            background: var(--tg-theme-secondary-bg-color, #f9f9f9);
+            border-radius: 15px;
+            padding: 15px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .cart-item-info h4 {
+            margin-bottom: 5px;
+        }
+
+        .cart-item-price {
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .cart-item-controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .remove-btn {
+            background: var(--danger);
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 15px;
+            cursor: pointer;
+        }
+
+        /* Profile Styles */
+        .profile-card {
+            background: var(--tg-theme-secondary-bg-color, #f9f9f9);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .profile-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: var(--primary);
+            margin: 0 auto 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            color: white;
+        }
+
+        .profile-info p {
+            margin: 8px 0;
+            padding: 10px;
+            background: var(--tg-theme-bg-color, white);
+            border-radius: 10px;
+        }
+
+        .points-badge {
+            background: linear-gradient(135deg, #ffd700, #ffa500);
+            color: white;
+            padding: 15px;
+            border-radius: 15px;
+            text-align: center;
+            font-weight: bold;
+            margin: 15px 0;
+        }
+
+        .points-value {
+            font-size: 2rem;
+            display: block;
+        }
+
+        /* Order History */
+        .order-card {
+            background: var(--tg-theme-secondary-bg-color, #f9f9f9);
+            border-radius: 15px;
+            padding: 15px;
+            margin-bottom: 10px;
+        }
+
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .order-items {
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .order-total {
+            font-weight: 600;
+            color: var(--primary);
+            margin-top: 8px;
+        }
+
+        .status {
+            color: var(--secondary);
+            font-weight: 600;
+        }
+
+        /* Cart Summary */
+        .cart-summary {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--tg-theme-secondary-bg-color, #f5f5f5);
+            padding: 15px;
+            border-radius: 30px 30px 0 0;
+            box-shadow: 0 -5px 20px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .cart-total {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .cart-total span {
+            color: var(--primary);
+            font-size: 1.5rem;
+        }
+
+        .checkout-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 30px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .checkout-btn:active {
+            transform: scale(0.95);
+        }
+
+        .empty-cart {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+
+        .empty-cart p {
+            font-size: 1.2rem;
+            margin-top: 10px;
+        }
+
+        /* Loyalty Banner */
+        .loyalty-banner {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 20px;
+            margin: 15px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .loyalty-banner button {
+            background: white;
+            color: #764ba2;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        /* Loading Spinner */
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-left-color: var(--primary);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 100px;
+            left: 20px;
+            right: 20px;
+            background: var(--primary);
+            color: white;
+            padding: 15px;
+            border-radius: 25px;
+            text-align: center;
+            animation: slideUp 0.3s;
+            z-index: 1000;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Bird Nest House</h1>
+        <p>Standards: 5S & Kaizen, Halal, GHPs/HACCP!</p>
+        <div class="user-info" id="userInfo">Loading user info...</div>
+    </div>
+
+    <div class="tabs">
+        <div class="tab active" onclick="switchTab('menu')">🍔 Menu</div>
+        <div class="tab" onclick="switchTab('cart')">🛒 Cart <span id="cartTabCount" class="hidden">(0)</span></div>
+        <div class="tab" onclick="switchTab('profile')">👤 Profile</div>
+    </div>
+
+    <!-- Menu Section -->
+    <div id="menuSection" class="section active">
+        <div class="loyalty-banner">
+            <div>
+                <strong>🎁 Loyalty Rewards</strong>
+                <p>Earn points with every order!</p>
+            </div>
+            <button onclick="switchTab('profile')">View Points</button>
+        </div>
+        <div id="menuLoader" class="spinner"></div>
+        <div id="menuGrid" class="menu-grid"></div>
+    </div>
+
+    <!-- Cart Section -->
+    <div id="cartSection" class="section">
+        <div id="cartItems"></div>
+        <div id="emptyCart" class="empty-cart">
+            🛒
+            <p>Your cart is empty</p>
+            <p>Add your health flavor!</p>
+        </div>
+    </div>
+
+    <!-- Profile Section -->
+    <div id="profileSection" class="section">
+        <div class="profile-card">
+            <div class="profile-avatar" id="profileAvatar">👤</div>
+            <div class="profile-info" id="profileInfo">
+                <p>Loading profile...</p>
+            </div>
+        </div>
+        
+        <div class="points-badge" id="pointsDisplay">
+            <span class="points-value">0</span>
+            <span>Loyalty Points</span>
+        </div>
+
+        <h3>📋 Recent Orders</h3>
+        <div id="orderHistory"></div>
+    </div>
+
+    <!-- Cart Summary (Fixed Bottom) -->
+    <div id="cartSummary" class="cart-summary hidden">
+        <div class="cart-total">
+            Total: <span id="cartTotal">$0.00</span>
+        </div>
+        <button class="checkout-btn" onclick="checkout()">Checkout →</button>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast hidden"></div>
+
+    <script>
+        const tg = window.Telegram.WebApp;
+        tg.expand();
+        tg.MainButton.hide();
+
+        // Menu data with images and categories
+        const menuItems = [
+            { 
+                id: 1, 
+                name: "Bird Nest 75ml for general", 
+                description: "100% pure bird's nests, ready to drink, self-life: 30days in fridge", 
+                price: 5,
+                category: "bird nest drinks",
+                image: "",
+                points: 0
+            },
+            { 
+                id: 2, 
+                name: "Bird Nest 75ml for diabetes", 
+                description: "100% pure bird's nests, ready to drink, self-life: 30days in fridge", 
+                price: 5,
+                category: "bird nest drinks",
+                image: "https://api.birdnestcambodia.com/uploads/_a5d444f73b.png",
+                points: 0
+            },
+            { 
+                id: 3, 
+                name: "Spicy Durger", 
+                description: "Jalapeños, pepper jack cheese, spicy mayo, crispy onions", 
+                price: 7.99,
+                category: "burgers",
+                image: "",
+                points: 12
+            },
+            { 
+                id: 4, 
+                name: "Veggie Durger", 
+                description: "Plant-based patty, avocado, sprouts, garlic aioli", 
+                price: 7.99,
+                category: "burgers",
+                image: "🥑🍔",
+                points: 12
+            },
+            { 
+                id: 5, 
+                name: "Chicken Durger", 
+                description: "Crispy chicken breast, lettuce, tomato, honey mustard", 
+                price: 6.99,
+                category: "chicken",
+                image: "🐔🍔",
+                points: 10
+            },
+            { 
+                id: 6, 
+                name: "Durger Fries", 
+                description: "Seasoned curly fries with cheese sauce and bacon bits", 
+                price: 4.99,
+                category: "sides",
+                image: "🍟",
+                points: 5
+            },
+            { 
+                id: 7, 
+                name: "Onion Rings", 
+                description: "Beer-battered onion rings with ranch dipping sauce", 
+                price: 4.99,
+                category: "sides",
+                image: "🧅",
+                points: 5
+            },
+            { 
+                id: 8, 
+                name: "Milkshake", 
+                description: "Thick and creamy - vanilla, chocolate, or strawberry", 
+                price: 4.99,
+                category: "drinks",
+                image: "🥤",
+                points: 5
+            },
+            { 
+                id: 9, 
+                name: "Durger Meal", 
+                description: "Classic Durger + Fries + Drink (Save $2!)", 
+                price: 11.99,
+                category: "meals",
+                image: "🍱",
+                points: 20
+            }
+        ];
+
+        // User data
+        let user = {
+            id: tg.initDataUnsafe?.user?.id || 'guest',
+            firstName: tg.initDataUnsafe?.user?.first_name || 'Guest',
+            lastName: tg.initDataUnsafe?.user?.last_name || '',
+            username: tg.initDataUnsafe?.user?.username || '',
+            photoUrl: tg.initDataUnsafe?.user?.photo_url || null
+        };
+
+        // App state
+        let cart = [];
+        let loyaltyPoints = 0;
+        let orderHistory = [];
+
+        // Load saved data
+        function loadData() {
+            const savedCart = localStorage.getItem(`cart_${user.id}`);
+            const savedPoints = localStorage.getItem(`points_${user.id}`);
+            const savedOrders = localStorage.getItem(`orders_${user.id}`);
+            
+            if (savedCart) cart = JSON.parse(savedCart);
+            if (savedPoints) loyaltyPoints = parseInt(savedPoints);
+            if (savedOrders) orderHistory = JSON.parse(savedOrders);
+            
+            updateCartCount();
+            updateCartDisplay();
+        }
+
+        // Save data
+        function saveData() {
+            localStorage.setItem(`cart_${user.id}`, JSON.stringify(cart));
+            localStorage.setItem(`points_${user.id}`, loyaltyPoints);
+            localStorage.setItem(`orders_${user.id}`, JSON.stringify(orderHistory));
+        }
+
+        // Initialize
+        function init() {
+            document.getElementById('userInfo').textContent = `Welcome, ${user.firstName}!`;
+            
+            if (user.photoUrl) {
+                document.getElementById('profileAvatar').innerHTML = 
+                    `<img src="${user.photoUrl}" style="width:100%; border-radius:50%;">`;
+            }
+            
+            updateProfileInfo();
+            renderMenu();
+            loadData();
+            simulateOrderHistory(); // For demo purposes
+        }
+
+        // Render menu grid
+        function renderMenu() {
+            const grid = document.getElementById('menuGrid');
+            const loader = document.getElementById('menuLoader');
+            
+            // Simulate loading
+            setTimeout(() => {
+                loader.classList.add('hidden');
+                grid.innerHTML = menuItems.map(item => `
+                    <div class="menu-item">
+                        <div class="item-image">${item.image}</div>
+                        <div class="item-details">
+                            <div class="item-header">
+                                <span class="item-name">${item.name}</span>
+                                <span class="item-price">$${item.price.toFixed(2)}</span>
+                            </div>
+                            <div class="item-description">${item.description}</div>
+                            <div class="item-controls">
+                                <div class="quantity-controls">
+                                    <button class="qty-btn" onclick="adjustQuantity(${item.id}, -1)">-</button>
+                                    <span class="qty-value" id="qty_${item.id}">0</span>
+                                    <button class="qty-btn" onclick="adjustQuantity(${item.id}, 1)">+</button>
+                                </div>
+                                <button class="add-btn" onclick="addToCart(${item.id})">
+                                    Add • <span id="itemPrice_${item.id}">$${item.price.toFixed(2)}</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            }, 500);
+        }
+
+        // Adjust quantity
+        function adjustQuantity(itemId, change) {
+            const qtyElement = document.getElementById(`qty_${itemId}`);
+            let qty = parseInt(qtyElement.textContent) + change;
+            qty = Math.max(0, Math.min(99, qty));
+            qtyElement.textContent = qty;
+            
+            // Update price display
+            const item = menuItems.find(i => i.id === itemId);
+            const priceElement = document.getElementById(`itemPrice_${itemId}`);
+            priceElement.textContent = `$${(item.price * (qty || 1)).toFixed(2)}`;
+        }
+
+        // Add to cart
+        function addToCart(itemId) {
+            const qty = parseInt(document.getElementById(`qty_${itemId}`).textContent) || 1;
+            const item = menuItems.find(i => i.id === itemId);
+            
+            for (let i = 0; i < qty; i++) {
+                cart.push({...item});
+            }
+            
+            // Reset quantity display
+            document.getElementById(`qty_${itemId}`).textContent = '0';
+            document.getElementById(`itemPrice_${itemId}`).textContent = `$${item.price.toFixed(2)}`;
+            
+            updateCartCount();
+            updateCartDisplay();
+            saveData();
+            
+            // Haptic feedback
+            tg.HapticFeedback.impactOccurred('light');
+            
+            // Show toast
+            showToast(`Added ${qty} × ${item.name} to cart!`);
+        }
+
+        // Update cart count
+        function updateCartCount() {
+            const count = cart.length;
+            const cartTab = document.getElementById('cartTabCount');
+            
+            if (count > 0) {
+                cartTab.textContent = `(${count})`;
+                cartTab.classList.remove('hidden');
+            } else {
+                cartTab.classList.add('hidden');
+            }
+        }
+
+        // Update cart display
+        function updateCartDisplay() {
+            const cartDiv = document.getElementById('cartItems');
+            const emptyCart = document.getElementById('emptyCart');
+            const cartSummary = document.getElementById('cartSummary');
+            
+            if (cart.length === 0) {
+                cartDiv.innerHTML = '';
+                emptyCart.classList.remove('hidden');
+                cartSummary.classList.add('hidden');
+                return;
+            }
+            
+            emptyCart.classList.add('hidden');
+            cartSummary.classList.remove('hidden');
+            
+            // Group cart items
+            const grouped = cart.reduce((acc, item) => {
+                acc[item.id] = acc[item.id] || { item, count: 0 };
+                acc[item.id].count++;
+                return acc;
+            }, {});
+            
+            cartDiv.innerHTML = Object.values(grouped).map(({item, count}) => `
+                <div class="cart-item">
+                    <div class="cart-item-info">
+                        <h4>${item.name} ${count > 1 ? `× ${count}` : ''}</h4>
+                        <span class="cart-item-price">$${(item.price * count).toFixed(2)}</span>
+                    </div>
+                    <div class="cart-item-controls">
+                        <button class="remove-btn" onclick="removeFromCart(${item.id})">Remove</button>
+                    </div>
+                </div>
+            `).join('');
+            
+            updateCartTotal();
+        }
+
+        // Remove from cart
+        function removeFromCart(itemId) {
+            const index = cart.findIndex(item => item.id === itemId);
+            if (index !== -1) {
+                cart.splice(index, 1);
+                updateCartCount();
+                updateCartDisplay();
+                saveData();
+                tg.HapticFeedback.notificationOccurred('success');
+            }
+        }
+
+        // Update cart total
+        function updateCartTotal() {
+            const total = cart.reduce((sum, item) => sum + item.price, 0);
+            document.getElementById('cartTotal').textContent = `$${total.toFixed(2)}`;
+        }
+
+        // Update profile info
+        function updateProfileInfo() {
+            document.getElementById('profileInfo').innerHTML = `
+                <p><strong>${user.firstName} ${user.lastName}</strong></p>
+                <p>@${user.username || 'no username'}</p>
+                <p>Member since: ${new Date().toLocaleDateString()}</p>
+            `;
+            
+            document.getElementById('pointsDisplay').querySelector('.points-value').textContent = loyaltyPoints;
+        }
+
+        // Simulate order history for demo
+        function simulateOrderHistory() {
+            if (orderHistory.length === 0) {
+                orderHistory = [
+                    {
+                        id: 'ORD001',
+                        date: new Date(Date.now() - 86400000).toLocaleDateString(),
+                        items: ['Classic Durger', 'Fries', 'Milkshake'],
+                        total: 15.97,
+                        status: 'Delivered',
+                        points: 20
+                    },
+                    {
+                        id: 'ORD002',
+                        date: new Date(Date.now() - 172800000).toLocaleDateString(),
+                        items: ['Double Durger', 'Onion Rings'],
+                        total: 13.98,
+                        status: 'Delivered',
+                        points: 18
+                    }
+                ];
+            }
+            
+            const historyDiv = document.getElementById('orderHistory');
+            historyDiv.innerHTML = orderHistory.map(order => `
+                <div class="order-card">
+                    <div class="order-header">
+                        <span><strong>${order.id}</strong></span>
+                        <span class="status">✓ ${order.status}</span>
+                    </div>
+                    <div class="order-items">${order.items.join(' • ')}</div>
+                    <div class="order-total">Total: $${order.total.toFixed(2)}</div>
+                    <small>Earned ${order.points} points</small>
+                </div>
+            `).join('');
+        }
+
+        // Checkout function
+        function checkout() {
+            if (cart.length === 0) {
+                showToast('Your cart is empty!');
+                return;
+            }
+            
+            const total = cart.reduce((sum, item) => sum + item.price, 0);
+            const pointsEarned = cart.reduce((sum, item) => sum + (item.points || 0), 0);
+            
+            // Create order
+            const order = {
+                id: 'ORD' + Math.floor(Math.random() * 1000),
+                date: new Date().toLocaleDateString(),
+                items: cart.map(item => item.name),
+                total: total,
+                status: 'Confirmed',
+                points: pointsEarned
+            };
+            
+            // Add to history and update points
+            orderHistory.unshift(order);
+            loyaltyPoints += pointsEarned;
+            
+            // Prepare order data for bot
+            const orderData = {
+                userId: user.id,
+                userName: `${user.firstName} ${user.lastName}`,
+                items: cart.map(item => ({
+                    name: item.name,
+                    price: item.price
+                })),
+                total: total.toFixed(2),
+                points: pointsEarned,
+                totalPoints: loyaltyPoints,
+                timestamp: new Date().toISOString()
+            };
+            
+            // Clear cart
+            cart = [];
+            updateCartCount();
+            updateCartDisplay();
+            updateProfileInfo();
+            saveData();
+            
+            // Send data to bot
+            tg.sendData(JSON.stringify(orderData));
+            
+            // Show success message
+            showToast(`Order placed! Earned ${pointsEarned} points!`, 3000);
+            
+            // Haptic feedback
+            tg.HapticFeedback.notificationOccurred('success');
+        }
+
+        // Switch tabs
+        function switchTab(tabName) {
+            // Update tab buttons
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Update sections
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.remove('active');
+            });
+            document.getElementById(`${tabName}Section`).classList.add('active');
+            
+            // Refresh displays
+            if (tabName === 'cart') {
+                updateCartDisplay();
+            } else if (tabName === 'profile') {
+                updateProfileInfo();
+                simulateOrderHistory();
+            }
+        }
+
+        // Show toast notification
+        function showToast(message, duration = 2000) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.remove('hidden');
+            
+            setTimeout(() => {
+                toast.classList.add('hidden');
+            }, duration);
+        }
+
+        // Start the app
+        init();
+    </script>
+</body>
+</html>
