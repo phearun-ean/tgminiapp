@@ -114,7 +114,7 @@ async def handle_web_app_data(update: Update, context: ContextTypes.DEFAULT_TYPE
 
 async def notify_admin(context: ContextTypes.DEFAULT_TYPE, order_id: str, order_data: dict):
     """Send notification to admin channel."""
-    admin_chat_id = "455774531"  # Set your admin chat ID
+    admin_chat_id = "YOUR_ADMIN_CHAT_ID"  # Set your admin chat ID
     
     admin_message = (
         f"🆕 *New Order!*\n\n"
