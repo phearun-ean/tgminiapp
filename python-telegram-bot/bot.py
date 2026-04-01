@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 
 # Configuration
 TOKEN = "8452975233:AAG-JdJ_0XBspAVj7xKRzbTSdtT0sWz4B-k"
-WEB_APP_URL = "https://brushed-moira-gleefully.ngrok-free.dev"  # Your hosted mini app URL
+WEB_APP_URL = "https://phearun-ean.github.io/tgminiapp/"  # Your hosted mini app URL
 
 # Database simulation (use real database in production)
 orders_db = {}
