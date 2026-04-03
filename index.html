@@ -939,10 +939,13 @@ console.log('User data loaded:', user); // For debugging
             // Prepare order data for bot
             const orderData = {
                 userId: user.id,
-                userName: `${user.firstName} ${user.lastName}`,
+                userName: `${user.firstName} ${user.lastName}`.trim(),
+                username: user.username || 'no_username',
+                firstName: user.firstName,
+                lastName: user.lastName,
                 items: cart.map(item => ({
-                    name: item.name,
-                    price: item.price
+                name: item.name,
+                price: item.price
                 })),
                 total: total.toFixed(2),
                 points: pointsEarned,
