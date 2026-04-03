@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 BOT_TOKEN = os.getenv("BOT_TOKEN")
-SELLER_CHAT_ID = "455774531"   # Your numeric chat ID
+SELLER_CHAT_ID = "455774531"   # Your numeric chat ID (get from @userinfobot)
 YOUR_WEB_APP_URL = "https://phearun-ean.github.io/tgminiapp/"
 
 logging.basicConfig(
@@ -48,28 +48,28 @@ async def handle_order(update: Update, context: ContextTypes.DEFAULT_TYPE):
             total = order_data.get('total', '0.00')
             points = order_data.get('points', 0)
             
-            # Build customer info using HTML (no escaping headaches)
-            customer_info = f"👤 <b>Customer:</b> {user_name}<br/>"
+            # Build customer info using HTML (with <br> not <br/>)
+            customer_info = f"👤 <b>Customer:</b> {user_name}<br>"
             if username:
-                customer_info += f"🆔 <b>Username:</b> @{username}<br/>"
-            customer_info += f"🔢 <b>User ID:</b> <code>{user_id}</code><br/>"
+                customer_info += f"🆔 <b>Username:</b> @{username}<br>"
+            customer_info += f"🔢 <b>User ID:</b> <code>{user_id}</code><br>"
             if first_name:
-                customer_info += f"📛 <b>First Name:</b> {first_name}<br/>"
+                customer_info += f"📛 <b>First Name:</b> {first_name}<br>"
             if last_name:
-                customer_info += f"📛 <b>Last Name:</b> {last_name}<br/>"
+                customer_info += f"📛 <b>Last Name:</b> {last_name}<br>"
             
             items_text = ""
             for item in items:
                 item_name = item.get('name', 'Unknown item')
                 item_price = item.get('price', 0)
-                items_text += f"  • {item_name} - ${item_price}<br/>"
+                items_text += f"  • {item_name} - ${item_price}<br>"
             
-            order_text = f"🆕 <b>NEW ORDER!</b><br/><br/>"
+            order_text = f"🆕 <b>NEW ORDER!</b><br><br>"
             order_text += customer_info
-            order_text += f"<br/>📦 <b>Items:</b><br/>{items_text}<br/>"
-            order_text += f"💰 <b>Total:</b> ${total}<br/>"
-            order_text += f"⭐ <b>Points Earned:</b> {points}<br/>"
-            order_text += f"🕐 <b>Time:</b> {order_data.get('timestamp', 'N/A')}<br/>"
+            order_text += f"<br>📦 <b>Items:</b><br>{items_text}<br>"
+            order_text += f"💰 <b>Total:</b> ${total}<br>"
+            order_text += f"⭐ <b>Points Earned:</b> {points}<br>"
+            order_text += f"🕐 <b>Time:</b> {order_data.get('timestamp', 'N/A')}<br>"
             
             # Send to seller (HTML parse mode)
             await context.bot.send_message(
