@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Bird Nest House - Order Now!</title>
+    <title>Bird Nest House</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         * {
@@ -35,37 +35,20 @@
             padding: 20px;
             text-align: center;
             border-radius: 0 0 30px 30px;
-            box-shadow: 0 4px 15px rgba(255, 107, 0, 0.3);
         }
 
-        .header h1 {
-            font-size: 2.5rem;
-            margin-bottom: 5px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
-        }
-
-        .header p {
-            font-size: 1rem;
-            opacity: 0.95;
-            margin-bottom: 15px;
-        }
-
-        .user-info {
-            background: rgba(255,255,255,0.2);
-            padding: 10px;
-            border-radius: 20px;
-            font-size: 0.9rem;
-        }
+        .header h1 { font-size: 2.5rem; margin-bottom: 5px; }
+        .header p { font-size: 1rem; margin-bottom: 15px; }
+        .user-info { background: rgba(255,255,255,0.2); padding: 10px; border-radius: 20px; }
 
         .tabs {
             display: flex;
-            background: var(--tg-theme-secondary-bg-color, #f5f5f5);
+            background: #f5f5f5;
             padding: 5px;
             border-radius: 30px;
             margin: 15px;
             gap: 5px;
         }
-
         .tab {
             flex: 1;
             text-align: center;
@@ -73,46 +56,26 @@
             border-radius: 25px;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s;
         }
-
-        .tab.active {
-            background: var(--primary);
-            color: white;
-        }
+        .tab.active { background: var(--primary); color: white; }
 
         .category-filters {
             display: flex;
             gap: 10px;
-            margin: 15px 15px 10px 15px;
+            margin: 15px;
             overflow-x: auto;
-            padding-bottom: 5px;
         }
-
         .filter-btn {
             padding: 8px 18px;
             border-radius: 30px;
-            background: var(--tg-theme-secondary-bg-color, #f0f0f0);
+            background: #f0f0f0;
             border: none;
-            font-weight: 500;
-            white-space: nowrap;
             cursor: pointer;
-            transition: all 0.2s;
         }
+        .filter-btn.active { background: var(--primary); color: white; }
 
-        .filter-btn.active {
-            background: var(--primary);
-            color: white;
-        }
-
-        .section {
-            display: none;
-            padding: 0 15px 15px 15px;
-        }
-
-        .section.active {
-            display: block;
-        }
+        .section { display: none; padding: 0 15px 15px; }
+        .section.active { display: block; }
 
         .menu-grid {
             display: grid;
@@ -120,19 +83,12 @@
             gap: 15px;
             margin-top: 10px;
         }
-
         .menu-item {
-            background: var(--tg-theme-secondary-bg-color, #f9f9f9);
+            background: #f9f9f9;
             border-radius: 20px;
             overflow: hidden;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-            transition: transform 0.3s;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
-
-        .menu-item:hover {
-            transform: translateY(-3px);
-        }
-
         .item-image {
             width: 100%;
             height: 180px;
@@ -141,101 +97,20 @@
             align-items: center;
             justify-content: center;
             font-size: 4rem;
-            color: #888;
         }
-
-        .item-image img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .item-details {
-            padding: 15px;
-        }
-
-        .item-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 8px;
-        }
-
-        .item-name {
-            font-size: 1.2rem;
-            font-weight: 600;
-        }
-
-        .item-price {
-            color: var(--primary);
-            font-weight: 700;
-            font-size: 1.3rem;
-        }
-
-        .item-description {
-            color: var(--tg-theme-hint-color, #666);
-            font-size: 0.85rem;
-            margin-bottom: 15px;
-            line-height: 1.4;
-        }
-
-        .item-controls {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .quantity-controls {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            background: white;
-            border-radius: 25px;
-            padding: 5px;
-        }
-
-        .qty-btn {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            border: none;
-            background: var(--primary);
-            color: white;
-            font-weight: bold;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.2rem;
-        }
-
-        .qty-btn:active {
-            transform: scale(0.95);
-        }
-
-        .qty-value {
-            font-weight: 600;
-            min-width: 25px;
-            text-align: center;
-        }
-
-        .add-btn {
-            background: var(--primary);
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 25px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background 0.3s;
-        }
-
-        .add-btn:active {
-            background: var(--primary-dark);
-        }
+        .item-image img { width: 100%; height: 100%; object-fit: cover; }
+        .item-details { padding: 15px; }
+        .item-header { display: flex; justify-content: space-between; margin-bottom: 8px; }
+        .item-name { font-size: 1.2rem; font-weight: 600; }
+        .item-price { color: var(--primary); font-weight: 700; font-size: 1.3rem; }
+        .item-description { color: #666; font-size: 0.85rem; margin-bottom: 15px; }
+        .item-controls { display: flex; justify-content: space-between; align-items: center; }
+        .quantity-controls { display: flex; gap: 10px; background: white; border-radius: 25px; padding: 5px; }
+        .qty-btn { width: 32px; height: 32px; border-radius: 50%; border: none; background: var(--primary); color: white; font-weight: bold; cursor: pointer; }
+        .add-btn { background: var(--primary); color: white; border: none; padding: 10px 20px; border-radius: 25px; font-weight: 600; cursor: pointer; }
 
         .cart-item {
-            background: var(--tg-theme-secondary-bg-color, #f9f9f9);
+            background: #f9f9f9;
             border-radius: 15px;
             padding: 15px;
             margin-bottom: 10px;
@@ -243,40 +118,15 @@
             justify-content: space-between;
             align-items: center;
         }
-
-        .cart-item-info h4 {
-            margin-bottom: 5px;
-        }
-
-        .cart-item-price {
-            color: var(--primary);
-            font-weight: 600;
-        }
-
-        .cart-item-controls {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .remove-btn {
-            background: var(--danger);
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 20px;
-            cursor: pointer;
-            font-weight: 500;
-        }
+        .remove-btn { background: var(--danger); color: white; border: none; padding: 8px 16px; border-radius: 20px; cursor: pointer; }
 
         .profile-card {
-            background: var(--tg-theme-secondary-bg-color, #f9f9f9);
+            background: #f9f9f9;
             border-radius: 20px;
             padding: 20px;
-            margin-bottom: 15px;
             text-align: center;
+            margin-bottom: 15px;
         }
-
         .profile-avatar {
             width: 80px;
             height: 80px;
@@ -288,74 +138,23 @@
             justify-content: center;
             font-size: 2.5rem;
             color: white;
-            overflow: hidden;
         }
-
-        .profile-avatar img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .profile-info p {
-            margin: 8px 0;
-            padding: 10px;
-            background: var(--tg-theme-bg-color, white);
-            border-radius: 10px;
-        }
-
         .points-badge {
             background: linear-gradient(135deg, #ffd700, #ffa500);
             color: white;
             padding: 15px;
             border-radius: 15px;
             text-align: center;
-            font-weight: bold;
             margin: 15px 0;
         }
-
-        .points-value {
-            font-size: 2rem;
-            display: block;
-        }
-
-        .order-card {
-            background: var(--tg-theme-secondary-bg-color, #f9f9f9);
-            border-radius: 15px;
-            padding: 15px;
-            margin-bottom: 10px;
-        }
-
-        .order-header {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 10px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid #ddd;
-        }
-
-        .order-items {
-            font-size: 0.9rem;
-            color: #666;
-        }
-
-        .order-total {
-            font-weight: 600;
-            color: var(--primary);
-            margin-top: 8px;
-        }
-
-        .status {
-            color: var(--secondary);
-            font-weight: 600;
-        }
+        .points-value { font-size: 2rem; display: block; }
 
         .cart-summary {
             position: fixed;
             bottom: 0;
             left: 0;
             right: 0;
-            background: var(--tg-theme-secondary-bg-color, #f5f5f5);
+            background: white;
             padding: 15px 20px;
             border-radius: 30px 30px 0 0;
             box-shadow: 0 -5px 20px rgba(0,0,0,0.1);
@@ -364,39 +163,8 @@
             align-items: center;
             z-index: 100;
         }
-
-        .cart-total {
-            font-size: 1.2rem;
-            font-weight: 600;
-        }
-
-        .cart-total span {
-            color: var(--primary);
-            font-size: 1.5rem;
-        }
-
-        .checkout-btn {
-            background: var(--primary);
-            color: white;
-            border: none;
-            padding: 12px 28px;
-            border-radius: 30px;
-            font-weight: 600;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: transform 0.2s;
-        }
-
-        .checkout-btn:active {
-            transform: scale(0.96);
-        }
-
-        .empty-cart {
-            text-align: center;
-            padding: 40px;
-            color: #999;
-        }
-
+        .checkout-btn { background: var(--primary); color: white; border: none; padding: 12px 28px; border-radius: 30px; font-weight: bold; cursor: pointer; }
+        .empty-cart { text-align: center; padding: 40px; color: #999; }
         .loyalty-banner {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
@@ -407,35 +175,7 @@
             justify-content: space-between;
             align-items: center;
         }
-
-        .loyalty-banner button {
-            background: white;
-            color: #764ba2;
-            border: none;
-            padding: 8px 18px;
-            border-radius: 25px;
-            font-weight: 600;
-            cursor: pointer;
-        }
-
-        .spinner {
-            border: 4px solid rgba(0, 0, 0, 0.1);
-            border-left-color: var(--primary);
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-            margin: 20px auto;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        .hidden {
-            display: none !important;
-        }
-
+        .hidden { display: none !important; }
         .toast {
             position: fixed;
             bottom: 100px;
@@ -446,20 +186,56 @@
             padding: 12px;
             border-radius: 30px;
             text-align: center;
-            animation: fadeInUp 0.3s;
             z-index: 1000;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
         }
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--primary);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
 
-        @keyframes fadeInUp {
-            from {
-                transform: translateY(100%);
-                opacity: 0;
-            }
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
+        /* Name prompt modal */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+        .modal-content {
+            background: white;
+            padding: 25px;
+            border-radius: 25px;
+            width: 80%;
+            max-width: 300px;
+            text-align: center;
+        }
+        .modal-content input {
+            width: 100%;
+            padding: 12px;
+            margin: 15px 0;
+            border: 1px solid #ddd;
+            border-radius: 25px;
+            font-size: 1rem;
+        }
+        .modal-content button {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 25px;
+            width: 100%;
+            font-weight: bold;
         }
     </style>
 </head>
@@ -467,7 +243,7 @@
     <div class="header">
         <h1>Bird Nest House</h1>
         <p>Standards: 5S & Kaizen, Halal, GHPs/HACCP!</p>
-        <div class="user-info" id="userInfo">Loading user info...</div>
+        <div class="user-info" id="userInfo">Loading...</div>
     </div>
 
     <div class="tabs">
@@ -478,10 +254,7 @@
 
     <div id="menuSection" class="section active">
         <div class="loyalty-banner">
-            <div>
-                <strong>🎁 Loyalty Rewards</strong>
-                <p>Earn 1 point per $1 spent!</p>
-            </div>
+            <div><strong>🎁 Loyalty Rewards</strong><p>Earn 1 point per $1 spent!</p></div>
             <button onclick="switchTab('profile')">View Points</button>
         </div>
         <div class="category-filters" id="categoryFilters">
@@ -495,35 +268,24 @@
 
     <div id="cartSection" class="section">
         <div id="cartItems"></div>
-        <div id="emptyCart" class="empty-cart">
-            🛒
-            <p>Your cart is empty</p>
-            <p>Add some healthy bird nest products!</p>
-        </div>
+        <div id="emptyCart" class="empty-cart">🛒<p>Your cart is empty</p></div>
     </div>
 
     <div id="profileSection" class="section">
         <div class="profile-card">
             <div class="profile-avatar" id="profileAvatar">👤</div>
-            <div class="profile-info" id="profileInfo">
-                <p>Loading profile...</p>
-            </div>
+            <div class="profile-info" id="profileInfo"></div>
         </div>
-        
         <div class="points-badge" id="pointsDisplay">
             <span class="points-value">0</span>
             <span>Loyalty Points</span>
-            <small style="display:block; margin-top:5px;">(1 point = $1 spent)</small>
         </div>
-
         <h3>📋 Your Orders</h3>
         <div id="orderHistory"></div>
     </div>
 
     <div id="cartSummary" class="cart-summary hidden">
-        <div class="cart-total">
-            Total: <span id="cartTotal">$0.00</span>
-        </div>
+        <div class="cart-total">Total: <span id="cartTotal">$0.00</span></div>
         <button class="checkout-btn" onclick="checkout()">Checkout →</button>
     </div>
 
@@ -532,26 +294,27 @@
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand();
-        tg.MainButton.hide();
 
+        // ---------- MENU DATA ----------
         const menuItems = [
-            { id: 1, name: "Bird Nest 75ml (general)", description: "100% pure bird's nests, ready to drink, shelf-life: 30 days in fridge", price: 5, category: "bird nest drinks", image: "https://i.postimg.cc/rw3v9gyK/75ml.png" },
-            { id: 2, name: "Bird Nest 75ml (6 bottles)", description: "100% pure bird's nests, ready to drink, shelf-life: 30 days in fridge", price: 30, category: "bird nest drinks", image: "https://i.postimg.cc/Dw89sRhZ/75ml_6bottle.png" },
-            { id: 3, name: "Bird Nest 75ml (6 bottles original taste)", description: "100% pure bird's nests, original taste", price: 30, category: "bird nest drinks", image: "https://i.postimg.cc/vZcJ9Cyc/75ml_6bottle_original.png" },
-            { id: 4, name: "Bird Nest 75ml (diabetic)", description: "Suitable for diabetic, no added sugar", price: 5, category: "bird nest drinks", image: "https://i.postimg.cc/vZcJ9Cyc/75ml_6bottle_original.png" },
-            { id: 5, name: "Bird Nest 75ml (6 bottles diabetic)", description: "6 bottles diabetic-friendly", price: 30, category: "bird nest drinks", image: "https://i.postimg.cc/vZcJ9Cyc/75ml_6bottle_original.png" },
-            { id: 6, name: "Bird Nest 100ml", description: "100% pure, ready to drink", price: 10, category: "bird nest drinks", image: "https://i.postimg.cc/XYpRFtW7/100ml.png" },
-            { id: 7, name: "Bird Nest 150ml", description: "100% pure, ready to drink", price: 12, category: "bird nest drinks", image: "https://i.postimg.cc/htfkxNnQ/150ml.png" },
-            { id: 8, name: "Bird Nest 200ml", description: "100% pure, ready to drink", price: 15, category: "bird nest drinks", image: "https://i.postimg.cc/8s8mhCxR/200ml.png" },
-            { id: 9, name: "Bird Nest 250ml", description: "100% pure, ready to drink", price: 20, category: "bird nest drinks", image: "https://i.postimg.cc/PNGQmq0m/250ml.png" },
-            { id: 10, name: "Bird Nest 500ml", description: "100% pure, ready to drink", price: 50, category: "bird nest drinks", image: "https://i.postimg.cc/ZqZH0ChV/500ml.png" },
-            { id: 11, name: "Bird Nest 1000ml", description: "100% pure, ready to drink", price: 100, category: "bird nest drinks", image: "https://i.postimg.cc/Wb1Pq1sV/1000ml.png" },
-            { id: 12, name: "Bird Nest Grade A (100g)", description: "Dried, semi-final product, shelf-life: 3 years", price: 290, category: "Dried bird nest", image: "https://i.postimg.cc/Pq6bSyBf/Grade_A.png" },
-            { id: 13, name: "Bird Nest Konkat (100g)", description: "Dried, high quality", price: 250, category: "Dried bird nest", image: "https://i.postimg.cc/zXWNCP93/Konkat.png" },
-            { id: 14, name: "Bird Nest Num (100g)", description: "Dried, semi-final product", price: 180, category: "Dried bird nest", image: "https://i.postimg.cc/sXwxR035/Bird_s_Nest_Num1_100g.png" },
-            { id: 15, name: "Bird Nest Princess (100g)", description: "Premium dried bird nest", price: 200, category: "Dried bird nest", image: "" }
+            { id: 1, name: "Bird Nest 75ml (general)", description: "100% pure bird's nests, ready to drink", price: 5, category: "bird nest drinks", image: "https://i.postimg.cc/rw3v9gyK/75ml.png" },
+            { id: 2, name: "Bird Nest 75ml (6 bottles)", description: "100% pure bird's nests", price: 30, category: "bird nest drinks", image: "https://i.postimg.cc/Dw89sRhZ/75ml_6bottle.png" },
+            { id: 3, name: "Bird Nest 75ml (6 bottles original)", description: "Original taste", price: 30, category: "bird nest drinks", image: "https://i.postimg.cc/vZcJ9Cyc/75ml_6bottle_original.png" },
+            { id: 4, name: "Bird Nest 75ml (diabetic)", description: "No added sugar", price: 5, category: "bird nest drinks", image: "https://i.postimg.cc/vZcJ9Cyc/75ml_6bottle_original.png" },
+            { id: 5, name: "Bird Nest 75ml (6 bottles diabetic)", description: "Diabetic-friendly", price: 30, category: "bird nest drinks", image: "https://i.postimg.cc/vZcJ9Cyc/75ml_6bottle_original.png" },
+            { id: 6, name: "Bird Nest 100ml", description: "100% pure", price: 10, category: "bird nest drinks", image: "https://i.postimg.cc/XYpRFtW7/100ml.png" },
+            { id: 7, name: "Bird Nest 150ml", description: "100% pure", price: 12, category: "bird nest drinks", image: "https://i.postimg.cc/htfkxNnQ/150ml.png" },
+            { id: 8, name: "Bird Nest 200ml", description: "100% pure", price: 15, category: "bird nest drinks", image: "https://i.postimg.cc/8s8mhCxR/200ml.png" },
+            { id: 9, name: "Bird Nest 250ml", description: "100% pure", price: 20, category: "bird nest drinks", image: "https://i.postimg.cc/PNGQmq0m/250ml.png" },
+            { id: 10, name: "Bird Nest 500ml", description: "100% pure", price: 50, category: "bird nest drinks", image: "https://i.postimg.cc/ZqZH0ChV/500ml.png" },
+            { id: 11, name: "Bird Nest 1000ml", description: "100% pure", price: 100, category: "bird nest drinks", image: "https://i.postimg.cc/Wb1Pq1sV/1000ml.png" },
+            { id: 12, name: "Bird Nest Grade A (100g)", description: "Dried, shelf-life 3 years", price: 290, category: "Dried bird nest", image: "https://i.postimg.cc/Pq6bSyBf/Grade_A.png" },
+            { id: 13, name: "Bird Nest Konkat (100g)", description: "Dried high quality", price: 250, category: "Dried bird nest", image: "https://i.postimg.cc/zXWNCP93/Konkat.png" },
+            { id: 14, name: "Bird Nest Num (100g)", description: "Dried", price: 180, category: "Dried bird nest", image: "https://i.postimg.cc/sXwxR035/Bird_s_Nest_Num1_100g.png" },
+            { id: 15, name: "Bird Nest Princess (100g)", description: "Premium dried", price: 200, category: "Dried bird nest", image: "" }
         ];
 
+        // ---------- USER DATA (with fallback prompt) ----------
         let user = {
             id: 'guest',
             firstName: 'Guest',
@@ -560,32 +323,69 @@
             photoUrl: null
         };
 
-        if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
-            user.id = tg.initDataUnsafe.user.id || 'guest';
-            user.firstName = tg.initDataUnsafe.user.first_name || 'Guest';
-            user.lastName = tg.initDataUnsafe.user.last_name || '';
-            user.username = tg.initDataUnsafe.user.username || '';
-            user.photoUrl = tg.initDataUnsafe.user.photo_url || null;
+        // Try to get from Telegram
+        function getTelegramUser() {
+            if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
+                const u = tg.initDataUnsafe.user;
+                return {
+                    id: u.id || 'guest',
+                    firstName: u.first_name || 'Guest',
+                    lastName: u.last_name || '',
+                    username: u.username || '',
+                    photoUrl: u.photo_url || null
+                };
+            }
+            return null;
+        }
+
+        let tgUser = getTelegramUser();
+        if (tgUser && tgUser.id !== 'guest') {
+            user = tgUser;
+            localStorage.setItem('birdnest_user', JSON.stringify(user));
         } else {
-            const urlParams = new URLSearchParams(window.location.search);
-            if (urlParams.get('user_id')) {
-                user.id = urlParams.get('user_id');
-                user.firstName = urlParams.get('first_name') || 'User';
+            let saved = localStorage.getItem('birdnest_user');
+            if (saved) {
+                user = JSON.parse(saved);
+            } else {
+                // Show name prompt
+                showNamePrompt();
             }
         }
 
+        function showNamePrompt() {
+            const modal = document.createElement('div');
+            modal.className = 'modal';
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <h3>👋 Welcome!</h3>
+                    <p>Please enter your name so we know who's ordering:</p>
+                    <input type="text" id="customerName" placeholder="Your name" autocomplete="off">
+                    <button id="saveNameBtn">Continue</button>
+                </div>
+            `;
+            document.body.appendChild(modal);
+            document.getElementById('saveNameBtn').onclick = () => {
+                let name = document.getElementById('customerName').value.trim();
+                if (name) {
+                    user.firstName = name;
+                    user.userName = name;
+                    user.id = 'user_' + Date.now();
+                    localStorage.setItem('birdnest_user', JSON.stringify(user));
+                    modal.remove();
+                    startApp(); // start the app after name is set
+                } else {
+                    alert('Please enter your name');
+                }
+            };
+        }
+
+        // ---------- APP STATE ----------
         let cart = [];
         let loyaltyPoints = 0;
         let orderHistory = [];
         let currentCategory = "all";
 
-        function showToast(message, duration = 2000) {
-            const toast = document.getElementById('toast');
-            toast.textContent = message;
-            toast.classList.remove('hidden');
-            setTimeout(() => toast.classList.add('hidden'), duration);
-        }
-
+        // Helper functions
         function saveData() {
             localStorage.setItem(`cart_${user.id}`, JSON.stringify(cart));
             localStorage.setItem(`points_${user.id}`, loyaltyPoints);
@@ -593,9 +393,9 @@
         }
 
         function loadData() {
-            const savedCart = localStorage.getItem(`cart_${user.id}`);
-            const savedPoints = localStorage.getItem(`points_${user.id}`);
-            const savedOrders = localStorage.getItem(`orders_${user.id}`);
+            let savedCart = localStorage.getItem(`cart_${user.id}`);
+            let savedPoints = localStorage.getItem(`points_${user.id}`);
+            let savedOrders = localStorage.getItem(`orders_${user.id}`);
             if (savedCart) cart = JSON.parse(savedCart);
             if (savedPoints) loyaltyPoints = parseInt(savedPoints);
             if (savedOrders) orderHistory = JSON.parse(savedOrders);
@@ -604,132 +404,97 @@
         }
 
         function updateCartCount() {
-            const count = cart.length;
-            const cartTabSpan = document.getElementById('cartTabCount');
+            let count = cart.length;
+            let span = document.getElementById('cartTabCount');
             if (count > 0) {
-                cartTabSpan.textContent = `(${count})`;
-                cartTabSpan.classList.remove('hidden');
+                span.textContent = `(${count})`;
+                span.classList.remove('hidden');
             } else {
-                cartTabSpan.classList.add('hidden');
+                span.classList.add('hidden');
             }
         }
 
         function updateCartDisplay() {
-            const cartDiv = document.getElementById('cartItems');
-            const emptyCart = document.getElementById('emptyCart');
-            const cartSummary = document.getElementById('cartSummary');
-            
+            let cartDiv = document.getElementById('cartItems');
+            let emptyCart = document.getElementById('emptyCart');
+            let summary = document.getElementById('cartSummary');
             if (cart.length === 0) {
                 cartDiv.innerHTML = '';
                 emptyCart.classList.remove('hidden');
-                cartSummary.classList.add('hidden');
+                summary.classList.add('hidden');
                 return;
             }
-            
             emptyCart.classList.add('hidden');
-            cartSummary.classList.remove('hidden');
-            
-            const grouped = cart.reduce((acc, item) => {
-                const key = item.id;
-                if (!acc[key]) acc[key] = { item, count: 0 };
-                acc[key].count++;
-                return acc;
-            }, {});
-            
-            cartDiv.innerHTML = Object.values(grouped).map(({item, count}) => `
+            summary.classList.remove('hidden');
+            // group items
+            let groups = {};
+            cart.forEach(item => { groups[item.id] = groups[item.id] || { item, count: 0 }; groups[item.id].count++; });
+            cartDiv.innerHTML = Object.values(groups).map(g => `
                 <div class="cart-item">
-                    <div class="cart-item-info">
-                        <h4>${escapeHtml(item.name)}</h4>
-                        <span class="cart-item-price">$${(item.price * count).toFixed(2)}</span>
-                        <div style="font-size:0.8rem; color:gray;">Quantity: ${count}</div>
-                    </div>
-                    <div class="cart-item-controls">
-                        <button class="remove-btn" onclick="removeAllFromCart(${item.id})">Remove all</button>
-                    </div>
+                    <div><b>${g.item.name}</b><br>$${g.item.price} x ${g.count} = $${(g.item.price * g.count).toFixed(2)}</div>
+                    <button class="remove-btn" onclick="removeItem(${g.item.id})">Remove</button>
                 </div>
             `).join('');
-            
-            const total = cart.reduce((sum, item) => sum + item.price, 0);
+            let total = cart.reduce((s, i) => s + i.price, 0);
             document.getElementById('cartTotal').textContent = `$${total.toFixed(2)}`;
         }
 
-        function removeAllFromCart(itemId) {
-            cart = cart.filter(item => item.id !== itemId);
+        function removeItem(id) {
+            cart = cart.filter(i => i.id !== id);
             updateCartCount();
             updateCartDisplay();
             saveData();
-            tg.HapticFeedback.notificationOccurred('warning');
-            showToast("Item removed from cart");
+            showToast("Item removed");
         }
 
-        function addToCart(itemId) {
-            const qtySpan = document.getElementById(`qty_${itemId}`);
+        function addToCart(id) {
+            let qtySpan = document.getElementById(`qty_${id}`);
             let qty = parseInt(qtySpan.textContent);
             if (isNaN(qty) || qty < 1) qty = 1;
-            
-            const item = menuItems.find(i => i.id === itemId);
-            for (let i = 0; i < qty; i++) {
-                cart.push({ ...item });
-            }
-            
+            let item = menuItems.find(i => i.id === id);
+            for (let i = 0; i < qty; i++) cart.push({ ...item });
             qtySpan.textContent = '0';
             updateCartCount();
             updateCartDisplay();
             saveData();
+            showToast(`Added ${qty} x ${item.name}`);
             tg.HapticFeedback.impactOccurred('light');
-            showToast(`Added ${qty} × ${item.name}`);
         }
 
-        function adjustQuantity(itemId, delta) {
-            const qtySpan = document.getElementById(`qty_${itemId}`);
-            let current = parseInt(qtySpan.textContent);
-            let newVal = current + delta;
-            if (newVal < 0) newVal = 0;
-            if (newVal > 99) newVal = 99;
-            qtySpan.textContent = newVal;
+        function adjustQuantity(id, delta) {
+            let span = document.getElementById(`qty_${id}`);
+            let val = parseInt(span.textContent) + delta;
+            if (val < 0) val = 0;
+            if (val > 99) val = 99;
+            span.textContent = val;
         }
 
         function renderMenu() {
-            const grid = document.getElementById('menuGrid');
-            const loader = document.getElementById('menuLoader');
+            let grid = document.getElementById('menuGrid');
+            let loader = document.getElementById('menuLoader');
             loader.classList.remove('hidden');
-            
             setTimeout(() => {
                 loader.classList.add('hidden');
-                const filtered = currentCategory === "all" 
-                    ? menuItems 
-                    : menuItems.filter(item => item.category === currentCategory);
-                
+                let filtered = currentCategory === 'all' ? menuItems : menuItems.filter(i => i.category === currentCategory);
                 if (filtered.length === 0) {
-                    grid.innerHTML = '<div style="text-align:center; padding:40px;">No items in this category</div>';
+                    grid.innerHTML = '<div style="text-align:center; padding:40px;">No items</div>';
                     return;
                 }
-                
                 grid.innerHTML = filtered.map(item => {
-                    let imageHtml = '';
-                    if (item.image && item.image.trim() !== '' && (item.image.startsWith('http') || item.image.startsWith('data:'))) {
-                        imageHtml = `<img src="${item.image}" alt="${item.name}" onerror="this.onerror=null; this.parentElement.innerHTML='🍽️';">`;
-                    } else {
-                        imageHtml = '🍽️';
-                    }
+                    let imgHtml = (item.image && item.image.startsWith('http')) ? `<img src="${item.image}" onerror="this.parentElement.innerHTML='🍽️'">` : '🍽️';
                     return `
                         <div class="menu-item">
-                            <div class="item-image">${imageHtml}</div>
+                            <div class="item-image">${imgHtml}</div>
                             <div class="item-details">
-                                <div class="item-header">
-                                    <span class="item-name">${escapeHtml(item.name)}</span>
-                                    <span class="item-price">$${item.price.toFixed(2)}</span>
-                                </div>
-                                <div class="item-description">${escapeHtml(item.description)}</div>
+                                <div class="item-header"><span class="item-name">${item.name}</span><span class="item-price">$${item.price}</span></div>
+                                <div class="item-description">${item.description}</div>
                                 <div class="item-controls">
                                     <div class="quantity-controls">
                                         <button class="qty-btn" onclick="adjustQuantity(${item.id}, -1)">-</button>
                                         <span class="qty-value" id="qty_${item.id}">0</span>
                                         <button class="qty-btn" onclick="adjustQuantity(${item.id}, 1)">+</button>
                                     </div>
-                                    <button class="add-btn" onclick="addToCart(${item.id})">
-                                        Add • $${item.price.toFixed(2)}
-                                    </button>
+                                    <button class="add-btn" onclick="addToCart(${item.id})">Add • $${item.price}</button>
                                 </div>
                             </div>
                         </div>
@@ -738,154 +503,103 @@
             }, 200);
         }
 
-        function escapeHtml(str) {
-            return str.replace(/[&<>]/g, function(m) {
-                if (m === '&') return '&amp;';
-                if (m === '<') return '&lt;';
-                if (m === '>') return '&gt;';
-                return m;
-            });
-        }
-
-        // ✅ FIXED: Checkout function now matches your bot's expected fields
         function checkout() {
-            if (cart.length === 0) {
-                showToast('Cart is empty!');
-                return;
-            }
-            
-            const total = cart.reduce((sum, item) => sum + item.price, 0);
-            const pointsEarned = Math.floor(total); // 1 point per dollar
-            
-            const order = {
-                id: 'ORD' + Date.now() + Math.floor(Math.random() * 1000),
+            if (cart.length === 0) { showToast('Cart empty'); return; }
+            let total = cart.reduce((s, i) => s + i.price, 0);
+            let pointsEarned = Math.floor(total);
+            let order = {
+                id: 'ORD' + Date.now(),
                 date: new Date().toLocaleString(),
-                items: cart.map(item => item.name),
+                items: cart.map(i => i.name),
                 total: total,
                 status: 'Confirmed',
                 pointsEarned: pointsEarned
             };
-            
             orderHistory.unshift(order);
             loyaltyPoints += pointsEarned;
-            
-            // Build the exact payload your bot expects
-            const orderData = {
+            let orderData = {
                 userId: user.id,
-                userName: `${user.firstName} ${user.lastName}`.trim(),
+                userName: user.firstName + (user.lastName ? ' ' + user.lastName : ''),
                 username: user.username || '',
                 firstName: user.firstName,
-                lastName: user.lastName,
-                items: cart.map(item => ({ name: item.name, price: item.price })),
-                total: total.toFixed(2),      // string as your bot expects
-                points: pointsEarned,          // ✅ changed from pointsEarned to points
+                lastName: user.lastName || '',
+                items: cart.map(i => ({ name: i.name, price: i.price })),
+                total: total.toFixed(2),
+                points: pointsEarned,
                 totalPoints: loyaltyPoints,
                 timestamp: new Date().toISOString()
             };
-            
-            // Clear cart
             cart = [];
             updateCartCount();
             updateCartDisplay();
             updateProfileInfo();
             saveData();
-            
-            // Send to bot and handle possible errors
-            try {
-                tg.sendData(JSON.stringify(orderData));
-                showToast(`✅ Order placed! Earned ${pointsEarned} points.`, 3000);
-                tg.HapticFeedback.notificationOccurred('success');
-                switchTab('profile');
-            } catch (err) {
-                console.error('Failed to send order:', err);
-                showToast('⚠️ Error sending order. Please try again.', 4000);
-                // Rollback: restore cart and points? For simplicity, we already cleared cart.
-                // But user can re-add items. Better to restore?
-                // We'll just inform user.
-            }
+            tg.sendData(JSON.stringify(orderData));
+            showToast(`✅ Order placed! Earned ${pointsEarned} points`);
+            tg.HapticFeedback.notificationOccurred('success');
+            switchTab('profile');
         }
-        
+
         function updateProfileInfo() {
             document.getElementById('profileInfo').innerHTML = `
-                <p><strong>${escapeHtml(user.firstName)} ${escapeHtml(user.lastName)}</strong></p>
-                <p>@${escapeHtml(user.username || 'no username')}</p>
-                <p>Member since: ${new Date().toLocaleDateString()}</p>
+                <p><strong>${user.firstName} ${user.lastName}</strong></p>
+                <p>@${user.username || 'no username'}</p>
             `;
             document.querySelector('#pointsDisplay .points-value').textContent = loyaltyPoints;
-            
-            const historyDiv = document.getElementById('orderHistory');
-            if (orderHistory.length === 0) {
-                historyDiv.innerHTML = '<p style="text-align:center; padding:20px;">No orders yet. Start shopping!</p>';
-            } else {
-                historyDiv.innerHTML = orderHistory.map(order => `
-                    <div class="order-card">
-                        <div class="order-header">
-                            <span><strong>${order.id}</strong></span>
-                            <span class="status">✓ ${order.status}</span>
-                        </div>
-                        <div class="order-items">${order.items.slice(0, 3).join(' • ')}${order.items.length > 3 ? ' ...' : ''}</div>
-                        <div class="order-total">Total: $${order.total.toFixed(2)}</div>
-                        <small>Earned ${order.pointsEarned} points</small>
-                        <div><small>${order.date}</small></div>
-                    </div>
-                `).join('');
-            }
+            let historyDiv = document.getElementById('orderHistory');
+            if (orderHistory.length === 0) historyDiv.innerHTML = '<p>No orders yet.</p>';
+            else historyDiv.innerHTML = orderHistory.map(o => `
+                <div style="background:#f9f9f9; border-radius:15px; padding:15px; margin-bottom:10px;">
+                    <b>${o.id}</b> - ${o.date}<br>
+                    ${o.items.slice(0,3).join(', ')}${o.items.length>3?'...':''}<br>
+                    Total: $${o.total.toFixed(2)}<br>
+                    Earned ${o.pointsEarned} points
+                </div>
+            `).join('');
         }
-        
+
         function switchTab(tabName) {
-            document.querySelectorAll('.tab').forEach(tab => {
-                if (tab.getAttribute('data-tab') === tabName) {
-                    tab.classList.add('active');
-                } else {
-                    tab.classList.remove('active');
-                }
-            });
-            
-            document.querySelectorAll('.section').forEach(section => {
-                section.classList.remove('active');
-            });
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelector(`.tab[data-tab="${tabName}"]`).classList.add('active');
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
             document.getElementById(`${tabName}Section`).classList.add('active');
-            
-            if (tabName === 'cart') {
-                updateCartDisplay();
-            } else if (tabName === 'profile') {
-                updateProfileInfo();
-            }
+            if (tabName === 'cart') updateCartDisplay();
+            if (tabName === 'profile') updateProfileInfo();
         }
-        
-        function initCategoryFilters() {
-            const filterBtns = document.querySelectorAll('.filter-btn');
-            filterBtns.forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    filterBtns.forEach(b => b.classList.remove('active'));
+
+        function showToast(msg) {
+            let toast = document.getElementById('toast');
+            toast.textContent = msg;
+            toast.classList.remove('hidden');
+            setTimeout(() => toast.classList.add('hidden'), 2000);
+        }
+
+        function startApp() {
+            document.getElementById('userInfo').textContent = `Welcome, ${user.firstName}!`;
+            if (user.photoUrl) document.getElementById('profileAvatar').innerHTML = `<img src="${user.photoUrl}" style="width:100%; border-radius:50%;">`;
+            loadData();
+            renderMenu();
+            updateProfileInfo();
+            // attach tab listeners
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.addEventListener('click', () => switchTab(tab.getAttribute('data-tab')));
+            });
+            // category filters
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
                     btn.classList.add('active');
                     currentCategory = btn.getAttribute('data-cat');
                     renderMenu();
                 });
             });
         }
-        
-        function init() {
-            document.getElementById('userInfo').textContent = `Welcome, ${user.firstName}!`;
-            if (user.photoUrl) {
-                const avatarDiv = document.getElementById('profileAvatar');
-                avatarDiv.innerHTML = `<img src="${user.photoUrl}" alt="avatar">`;
-            }
-            
-            loadData();
-            renderMenu();
-            updateProfileInfo();
-            initCategoryFilters();
-            
-            document.querySelectorAll('.tab').forEach(tab => {
-                tab.addEventListener('click', () => {
-                    const tabName = tab.getAttribute('data-tab');
-                    switchTab(tabName);
-                });
-            });
+
+        // If user is already set (from Telegram or localStorage), start immediately
+        if (user.id !== 'guest') {
+            startApp();
         }
-        
-        init();
+        // else, the prompt will call startApp() after name is entered
     </script>
 </body>
 </html>
