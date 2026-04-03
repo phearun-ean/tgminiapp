@@ -701,18 +701,17 @@ console.log('User data loaded:', user); // For debugging
 
         // Initialize
         function init() {
+            console.log('Telegram WebApp user data:', tg.initDataUnsafe?.user);
             document.getElementById('userInfo').textContent = `Welcome, ${user.firstName}!`;
-            
-            if (user.photoUrl) {
-                document.getElementById('profileAvatar').innerHTML = 
-                    `<img src="${user.photoUrl}" style="width:100%; border-radius:50%;">`;
-            }
+            // ... rest of your init code
+        }
+        
             
             updateProfileInfo();
             renderMenu();
             loadData();
             simulateOrderHistory(); // For demo purposes
-        }
+        
 
         // Render menu grid
         function renderMenu() {
