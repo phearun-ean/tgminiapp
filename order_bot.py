@@ -33,23 +33,41 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 
 async def handle_order(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Process order data sent from the Mini App."""
     message = update.effective_message
     if message and message.web_app_data:
         try:
             order_data = json.loads(message.web_app_data.data)
-            customer_name = order_data.get('userName', 'Guest')
+            
+            # Extract user info with fallbacks
+            user_id = order_data.get('userId', 'Unknown')
+            user_name = order_data.get('userName', 'Guest')
+            username = order_data.get('username', '')
+            first_name = order_data.get('firstName', '')
+            last_name = order_data.get('lastName', '')
+            
             items = order_data.get('items', [])
             total = order_data.get('total', '0.00')
             points = order_data.get('points', 0)
             
-            # Build notification for seller
-            order_text = f"🆕 *NEW ORDER!*\n\n"
-            order_text += f"👤 *Customer:* {customer_name}\n"
-            order_text += f"📦 *Items:*\n"
+            # Build detailed customer info
+            customer_info = f"👤 *Customer:* {user_name}\n"
+            if username:
+                customer_info += f"🆔 *Username:* @{username}\n"
+            customer_info += f"🔢 *User ID:* `{user_id}`\n"
+            if first_name:
+                customer_info += f"📛 *First Name:* {first_name}\n"
+            if last_name:
+                customer_info += f"📛 *Last Name:* {last_name}\n"
+            
+            # Build order items
+            items_text = ""
             for item in items:
-                order_text += f"  • {item['name']} - ${item['price']}\n"
-            order_text += f"\n💰 *Total:* ${total}\n"
+                items_text += f"  • {item['name']} - ${item['price']}\n"
+            
+            order_text = f"🆕 *NEW ORDER!*\n\n"
+            order_text += customer_info
+            order_text += f"\n📦 *Items:*\n{items_text}\n"
+            order_text += f"💰 *Total:* ${total}\n"
             order_text += f"⭐ *Points Earned:* {points}\n"
             order_text += f"🕐 *Time:* {order_data.get('timestamp', 'N/A')}\n"
             
@@ -62,15 +80,15 @@ async def handle_order(update: Update, context: ContextTypes.DEFAULT_TYPE):
             
             # Send confirmation back to customer
             await update.message.reply_text(
-                f"✅ *Order Confirmed!*\n\n"
-                f"Thank you {customer_name}!\n"
+                f"✅ *Order Confirmed, {user_name}!*\n\n"
+                f"Thank you for your order!\n"
                 f"Total: ${total}\n"
                 f"You earned {points} loyalty points 🎉\n\n"
                 f"We'll notify you when your order is ready.",
                 parse_mode="Markdown"
             )
             
-            logging.info(f"Order processed for {customer_name}: ${total}")
+            logging.info(f"Order from {user_name} (ID: {user_id}): ${total}")
             
         except Exception as e:
             logging.error(f"Error processing order: {e}")
