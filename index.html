@@ -443,7 +443,7 @@
     </div>
 
     <div class="tabs">
-        <div class="tab active" onclick="switchTab('menu')">🍔 Menu</div>
+        <div class="tab active" onclick="switchTab('menu')"> Menu</div>
         <div class="tab" onclick="switchTab('cart')">🛒 Cart <span id="cartTabCount" class="hidden">(0)</span></div>
         <div class="tab" onclick="switchTab('profile')">👤 Profile</div>
     </div>
@@ -513,80 +513,89 @@
                 description: "100% pure bird's nests, ready to drink, self-life: 30days in fridge", 
                 price: 5,
                 category: "bird nest drinks",
-                image: "",
+                image: "https://i.postimg.cc/rw3v9gyK/75ml.png",
                 points: 0
             },
             { 
                 id: 2, 
-                name: "Bird Nest 75ml for diabetes", 
+                name: "Bird Nest 75ml 6 bottles", 
                 description: "100% pure bird's nests, ready to drink, self-life: 30days in fridge", 
-                price: 5,
+                price: 30,
                 category: "bird nest drinks",
-                image: "https://api.birdnestcambodia.com/uploads/_a5d444f73b.png",
+                image: "https://i.postimg.cc/Dw89sRhZ/75ml_6bottle.png",
                 points: 0
             },
             { 
                 id: 3, 
-                name: "Spicy Durger", 
-                description: "Jalapeños, pepper jack cheese, spicy mayo, crispy onions", 
-                price: 7.99,
-                category: "burgers",
-                image: "",
-                points: 12
+                name: "Bird Nest 75ml 6 bottles original taste", 
+                description: "100% pure bird's nests, ready to drink, self-life: 30days in fridge", 
+                price: 30,
+                category: "bird nest drinks",
+                image: "https://i.postimg.cc/vZcJ9Cyc/75ml_6bottle_original.png",
+                points: 0
             },
             { 
                 id: 4, 
-                name: "Veggie Durger", 
-                description: "Plant-based patty, avocado, sprouts, garlic aioli", 
-                price: 7.99,
-                category: "burgers",
-                image: "🥑🍔",
-                points: 12
+                name: "Bird Nest 75ml for diabetic", 
+                description: "100% pure bird's nests, ready to drink, self-life: 30days in fridge", 
+                price: 5,
+                category: "bird nest drinks",
+                image: "https://i.postimg.cc/vZcJ9Cyc/75ml_6bottle_original.png",
+                points: 0
             },
             { 
                 id: 5, 
-                name: "Chicken Durger", 
-                description: "Crispy chicken breast, lettuce, tomato, honey mustard", 
-                price: 6.99,
-                category: "chicken",
-                image: "🐔🍔",
-                points: 10
+                name: "Bird Nest 75ml 6 bottles for diabetic", 
+                description: "100% pure bird's nests, ready to drink, self-life: 30days in fridge", 
+                price: 30,
+                category: "bird nest drinks",
+                image: "https://i.postimg.cc/vZcJ9Cyc/75ml_6bottle_original.png",
+                points: 0
             },
             { 
                 id: 6, 
-                name: "Durger Fries", 
-                description: "Seasoned curly fries with cheese sauce and bacon bits", 
-                price: 4.99,
-                category: "sides",
-                image: "🍟",
-                points: 5
+                name: "Bird Nest 100ml", 
+                description: "100% pure bird's nests, ready to drink, self-life: 30days in fridge", 
+                price: 10,
+                category: "bird nest drinks",
+                image: "https://i.postimg.cc/XYpRFtW7/100ml.png",
+                points: 0
             },
             { 
                 id: 7, 
-                name: "Onion Rings", 
-                description: "Beer-battered onion rings with ranch dipping sauce", 
-                price: 4.99,
-                category: "sides",
-                image: "🧅",
-                points: 5
+                name: "Bird Nest 150ml ", 
+                description: "100% pure bird's nests, ready to drink, self-life: 30days in fridge", 
+                price: 12,
+                category: "bird nest drinks",
+                image: "https://i.postimg.cc/htfkxNnQ/150ml.png.png",
+                points: 0
             },
             { 
                 id: 8, 
-                name: "Milkshake", 
-                description: "Thick and creamy - vanilla, chocolate, or strawberry", 
-                price: 4.99,
-                category: "drinks",
-                image: "🥤",
-                points: 5
+                name: "Bird Nest 200ml", 
+                description: "100% pure bird's nests, ready to drink, self-life: 30days in fridge", 
+                price: 15,
+                category: "bird nest drinks",
+                image: "https://i.postimg.cc/W1hBrxVD/200ml.png",
+                points: 0
             },
             { 
                 id: 9, 
-                name: "Durger Meal", 
-                description: "Classic Durger + Fries + Drink (Save $2!)", 
-                price: 11.99,
-                category: "meals",
-                image: "🍱",
-                points: 20
+                name: "Bird Nest 250ml", 
+                description: "100% pure bird's nests, ready to drink, self-life: 30days in fridge", 
+                price: 20,
+                category: "bird nest drinks",
+                image: "https://i.postimg.cc/Vkp3F4sk/250ml.png",
+                points: 0
+            },
+            { 
+                id: 10, 
+                name: "Bird Nest 250ml", 
+                description: "100% pure bird's nests, ready to drink, self-life: 30days in fridge", 
+                price: 20,
+                category: "bird nest drinks",
+                image: "https://i.postimg.cc/Vkp3F4sk/250ml.png",
+                points: 0
             }
         ];
 
@@ -642,36 +651,48 @@
 
         // Render menu grid
         function renderMenu() {
-            const grid = document.getElementById('menuGrid');
-            const loader = document.getElementById('menuLoader');
+    const grid = document.getElementById('menuGrid');
+    const loader = document.getElementById('menuLoader');
+    
+    setTimeout(() => {
+        loader.classList.add('hidden');
+        grid.innerHTML = menuItems.map(item => {
+            // Check if item.image is a valid image URL
+            const isImageUrl = item.image && (item.image.startsWith('http') || item.image.startsWith('https') || item.image.match(/\.(jpg|jpeg|png|gif|webp)$/i));
             
-            // Simulate loading
-            setTimeout(() => {
-                loader.classList.add('hidden');
-                grid.innerHTML = menuItems.map(item => `
-                    <div class="menu-item">
-                        <div class="item-image">${item.image}</div>
-                        <div class="item-details">
-                            <div class="item-header">
-                                <span class="item-name">${item.name}</span>
-                                <span class="item-price">$${item.price.toFixed(2)}</span>
+            let imageHtml = '';
+            if (isImageUrl) {
+                imageHtml = `<img src="${item.image}" alt="${item.name}" style="width:100%; height:100%; object-fit:cover;">`;
+            } else {
+                // Fallback to emoji or text
+                imageHtml = item.image || '🍽️';
+            }
+            
+            return `
+                <div class="menu-item">
+                    <div class="item-image">${imageHtml}</div>
+                    <div class="item-details">
+                        <div class="item-header">
+                            <span class="item-name">${item.name}</span>
+                            <span class="item-price">$${item.price.toFixed(2)}</span>
+                        </div>
+                        <div class="item-description">${item.description}</div>
+                        <div class="item-controls">
+                            <div class="quantity-controls">
+                                <button class="qty-btn" onclick="adjustQuantity(${item.id}, -1)">-</button>
+                                <span class="qty-value" id="qty_${item.id}">0</span>
+                                <button class="qty-btn" onclick="adjustQuantity(${item.id}, 1)">+</button>
                             </div>
-                            <div class="item-description">${item.description}</div>
-                            <div class="item-controls">
-                                <div class="quantity-controls">
-                                    <button class="qty-btn" onclick="adjustQuantity(${item.id}, -1)">-</button>
-                                    <span class="qty-value" id="qty_${item.id}">0</span>
-                                    <button class="qty-btn" onclick="adjustQuantity(${item.id}, 1)">+</button>
-                                </div>
-                                <button class="add-btn" onclick="addToCart(${item.id})">
-                                    Add • <span id="itemPrice_${item.id}">$${item.price.toFixed(2)}</span>
-                                </button>
-                            </div>
+                            <button class="add-btn" onclick="addToCart(${item.id})">
+                                Add • <span id="itemPrice_${item.id}">$${item.price.toFixed(2)}</span>
+                            </button>
                         </div>
                     </div>
-                `).join('');
-            }, 500);
-        }
+                </div>
+            `;
+        }).join('');
+    }, 500);
+}
 
         // Adjust quantity
         function adjustQuantity(itemId, change) {
