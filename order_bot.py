@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 BOT_TOKEN = os.getenv("BOT_TOKEN")
-SELLER_CHAT_ID = "455774531"
+SELLER_CHAT_ID = "455774531"   # Your numeric chat ID
 YOUR_WEB_APP_URL = "https://phearun-ean.github.io/tgminiapp/"
 
 logging.basicConfig(
@@ -19,16 +19,18 @@ logging.basicConfig(
 ORDERS_FILE = "orders.json"
 
 def load_orders():
+    """Load order storage from file"""
     if os.path.exists(ORDERS_FILE):
         with open(ORDERS_FILE, 'r') as f:
             return json.load(f)
     return {}
 
 def save_orders(orders):
+    """Save order storage to file"""
     with open(ORDERS_FILE, 'w') as f:
         json.dump(orders, f, indent=2)
 
-# Load existing orders
+# Load existing orders on startup
 order_storage = load_orders()
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -48,7 +50,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def handle_order(update: Update, context: ContextTypes.DEFAULT_TYPE):
     message = update.effective_message
-    buyer_chat_id = str(update.effective_chat.id)  # Use chat_id as primary key
+    buyer_chat_id = update.effective_chat.id
     
     if message and message.web_app_data:
         try:
@@ -65,19 +67,17 @@ async def handle_order(update: Update, context: ContextTypes.DEFAULT_TYPE):
             points = order_data.get('points', 0)
             timestamp = order_data.get('timestamp', 'N/A')
             
-            # Store using buyer_chat_id (more reliable)
-            order_storage[buyer_chat_id] = {
-                'user_id': user_id,
+            # Store in persistent storage
+            order_storage[user_id] = {
+                'chat_id': buyer_chat_id,
                 'user_name': user_name,
                 'username': username,
                 'first_name': first_name,
                 'last_name': last_name,
-                'chat_id': buyer_chat_id,
-                'order_id': f"ORD_{buyer_chat_id}_{int(datetime.now().timestamp())}",
-                'items': items,
+                'order_id': f"ORD_{user_id}_{int(datetime.now().timestamp())}",
+                'timestamp': timestamp,
                 'total': total,
-                'points': points,
-                'timestamp': timestamp
+                'points': points
             }
             save_orders(order_storage)
             
@@ -85,7 +85,7 @@ async def handle_order(update: Update, context: ContextTypes.DEFAULT_TYPE):
             customer_info = f"👤 <b>Customer:</b> {user_name}\n"
             if username:
                 customer_info += f"🆔 <b>Username:</b> @{username}\n"
-            customer_info += f"🔢 <b>Chat ID:</b> <code>{buyer_chat_id}</code>\n"
+            customer_info += f"🔢 <b>User ID:</b> <code>{user_id}</code>\n"
             if first_name:
                 customer_info += f"📛 <b>First Name:</b> {first_name}\n"
             if last_name:
@@ -107,8 +107,8 @@ async def handle_order(update: Update, context: ContextTypes.DEFAULT_TYPE):
             )
             
             keyboard = InlineKeyboardMarkup([
-                [InlineKeyboardButton("💬 Reply to Customer", callback_data=f"reply_{buyer_chat_id}")],
-                [InlineKeyboardButton("✅ Mark as Ready", callback_data=f"ready_{buyer_chat_id}")]
+                [InlineKeyboardButton("💬 Reply to Customer", callback_data=f"reply_{user_id}")],
+                [InlineKeyboardButton("✅ Mark as Ready", callback_data=f"ready_{user_id}")]
             ])
             
             await context.bot.send_message(
@@ -127,7 +127,7 @@ async def handle_order(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 parse_mode="HTML"
             )
             
-            logging.info(f"Order from {user_name} (Chat ID: {buyer_chat_id}): ${total}")
+            logging.info(f"Order from {user_name} (ID: {user_id}): ${total}")
             
         except Exception as e:
             logging.error(f"Error processing order: {e}", exc_info=True)
@@ -140,25 +140,23 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await query.answer()
     
     data = query.data
-    # Extract the chat_id (now stored as string)
     if data.startswith("reply_"):
-        chat_id = data.split("_", 1)[1]
-        if chat_id in order_storage:
-            context.user_data['reply_to'] = chat_id
+        user_id = data.split("_")[1]
+        if user_id in order_storage:
+            context.user_data['reply_to'] = user_id
             await query.edit_message_reply_markup(reply_markup=None)
             await query.message.reply_text(
-                f"✏️ Type your reply to {order_storage[chat_id]['user_name']}:\n"
+                f"✏️ Type your reply to {order_storage[user_id]['user_name']}:\n"
                 f"(Send a text message, photo, or any media)"
             )
         else:
-            logging.warning(f"Reply failed: chat_id {chat_id} not found in storage. Available keys: {list(order_storage.keys())}")
-            await query.message.reply_text("⚠️ Customer info expired. Cannot reply. The customer may need to place a new order.")
+            await query.message.reply_text("⚠️ Customer info expired or bot restarted. Please ask customer to place a new order.")
     
     elif data.startswith("ready_"):
-        chat_id = data.split("_", 1)[1]
-        if chat_id in order_storage:
-            buyer_chat_id = int(chat_id)  # chat_id stored as string, but send_message expects int
-            user_name = order_storage[chat_id]['user_name']
+        user_id = data.split("_")[1]
+        if user_id in order_storage:
+            buyer_chat_id = order_storage[user_id]['chat_id']
+            user_name = order_storage[user_id]['user_name']
             await context.bot.send_message(
                 chat_id=buyer_chat_id,
                 text=f"🍽️ <b>Your order is ready for pickup!</b>\n\n"
@@ -169,23 +167,22 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
             )
             await query.edit_message_reply_markup(reply_markup=None)
             await query.message.reply_text(f"✅ Sent 'order ready' notification to {user_name}.")
-            logging.info(f"Notified {user_name} (Chat ID: {chat_id}) that order is ready.")
+            logging.info(f"Notified {user_name} (ID: {user_id}) that order is ready.")
         else:
-            logging.warning(f"Ready failed: chat_id {chat_id} not found in storage.")
             await query.message.reply_text("⚠️ Customer info expired. Cannot send ready notification.")
 
 async def forward_reply(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if 'reply_to' not in context.user_data:
         return
     
-    chat_id = context.user_data['reply_to']
-    if chat_id not in order_storage:
+    user_id = context.user_data['reply_to']
+    if user_id not in order_storage:
         await update.message.reply_text("⚠️ Customer session expired. Cannot send message.")
         del context.user_data['reply_to']
         return
     
-    buyer_chat_id = int(chat_id)
-    user_name = order_storage[chat_id]['user_name']
+    buyer_chat_id = order_storage[user_id]['chat_id']
+    user_name = order_storage[user_id]['user_name']
     
     try:
         if update.message.text:
@@ -211,17 +208,28 @@ async def forward_reply(update: Update, context: ContextTypes.DEFAULT_TYPE):
             return
         
         await update.message.reply_text(f"✅ Message sent to {user_name}!")
-        logging.info(f"Reply sent to {user_name} (Chat ID: {chat_id})")
+        logging.info(f"Reply sent to {user_name} (ID: {user_id})")
         del context.user_data['reply_to']
         
     except Exception as e:
         logging.error(f"Failed to send reply: {e}")
         await update.message.reply_text("⚠️ Failed to send message. Customer may have blocked the bot.")
 
+async def clear_old_orders(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Admin command to clear old orders (optional)"""
+    if str(update.effective_chat.id) == SELLER_CHAT_ID:
+        global order_storage
+        order_storage = {}
+        save_orders(order_storage)
+        await update.message.reply_text("🗑️ All order data cleared.")
+    else:
+        await update.message.reply_text("Unauthorized.")
+
 def main():
     app = Application.builder().token(BOT_TOKEN).build()
     
     app.add_handler(CommandHandler("start", start))
+    app.add_handler(CommandHandler("clearorders", clear_old_orders))  # optional admin command
     app.add_handler(MessageHandler(filters.StatusUpdate.WEB_APP_DATA, handle_order))
     app.add_handler(CallbackQueryHandler(handle_callback))
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, forward_reply))
