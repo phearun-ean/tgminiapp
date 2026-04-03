@@ -6,12 +6,8 @@
     "first_name": "S&P Food and Beverages",
     "last_name": "",
     "chat_id": "1390786396",
-    "order_id": "ORD_1390786396_1775254155",
+    "order_id": "ORD_1390786396_1775254501",
     "items": [
-      {
-        "name": "Bird Nest 75ml (general)",
-        "price": 5
-      },
       {
         "name": "Bird Nest 75ml (general)",
         "price": 5
@@ -21,8 +17,8 @@
         "price": 5
       }
     ],
-    "total": "15.00",
-    "points": 15,
-    "timestamp": "2026-04-03T22:09:15.154Z"
+    "total": "10.00",
+    "points": 10,
+    "timestamp": "2026-04-03T22:15:00.792Z"
   }
 }
