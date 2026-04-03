@@ -39,9 +39,17 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def handle_order(update: Update, context: ContextTypes.DEFAULT_TYPE):
     message = update.effective_message
+    
+    # Log everything to see what arrives
+    logging.info(f"Received update: {update}")
+    
     if message and message.web_app_data:
         try:
-            order_data = json.loads(message.web_app_data.data)
+            raw_data = message.web_app_data.data
+            logging.info(f"Raw web_app_data: {raw_data}")
+            
+            order_data = json.loads(raw_data)
+            logging.info(f"Parsed order_data: {order_data}")
             
             # Extract user info with fallbacks
             user_id = order_data.get('userId', 'Unknown')
@@ -53,6 +61,10 @@ async def handle_order(update: Update, context: ContextTypes.DEFAULT_TYPE):
             items = order_data.get('items', [])
             total = order_data.get('total', '0.00')
             points = order_data.get('points', 0)
+            
+            # Validate items structure
+            if not isinstance(items, list):
+                raise ValueError(f"Items is not a list: {type(items)}")
             
             # Build detailed customer info
             customer_info = f"👤 *Customer:* {user_name}\n"
@@ -67,7 +79,10 @@ async def handle_order(update: Update, context: ContextTypes.DEFAULT_TYPE):
             # Build order items
             items_text = ""
             for item in items:
-                items_text += f"  • {item['name']} - ${item['price']}\n"
+                # Ensure each item has name and price
+                item_name = item.get('name', 'Unknown item')
+                item_price = item.get('price', 0)
+                items_text += f"  • {item_name} - ${item_price}\n"
             
             order_text = f"🆕 *NEW ORDER!*\n\n"
             order_text += customer_info
@@ -95,8 +110,11 @@ async def handle_order(update: Update, context: ContextTypes.DEFAULT_TYPE):
             
             logging.info(f"Order from {user_name} (ID: {user_id}): ${total}")
             
+        except json.JSONDecodeError as e:
+            logging.error(f"JSON decode error: {e}")
+            await update.message.reply_text("⚠️ Invalid order data format.")
         except Exception as e:
-            logging.error(f"Error processing order: {e}")
+            logging.error(f"Error processing order: {e}", exc_info=True)
             await update.message.reply_text("⚠️ Sorry, there was an error processing your order.")
     else:
         await update.message.reply_text("Click the button below to place an order.")
