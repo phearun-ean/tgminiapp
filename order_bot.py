@@ -1,13 +1,14 @@
 import logging
 import json
 import os
+import html
 from telegram import Update, KeyboardButton, ReplyKeyboardMarkup, WebAppInfo
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes
 from dotenv import load_dotenv
 
 load_dotenv()
 BOT_TOKEN = os.getenv("BOT_TOKEN")
-SELLER_CHAT_ID = "455774531"   # Your numeric chat ID (get from @userinfobot)
+SELLER_CHAT_ID = "455774531"   # Your numeric chat ID
 YOUR_WEB_APP_URL = "https://phearun-ean.github.io/tgminiapp/"
 
 logging.basicConfig(
@@ -38,40 +39,43 @@ async def handle_order(update: Update, context: ContextTypes.DEFAULT_TYPE):
             raw_data = message.web_app_data.data
             order_data = json.loads(raw_data)
             
-            # Extract user info
-            user_id = order_data.get('userId', 'Unknown')
-            user_name = order_data.get('userName', 'Guest')
-            username = order_data.get('username', '')
-            first_name = order_data.get('firstName', '')
-            last_name = order_data.get('lastName', '')
+            # Extract user info with safe defaults
+            user_id = html.escape(str(order_data.get('userId', 'Unknown')))
+            user_name = html.escape(order_data.get('userName', 'Guest'))
+            username = html.escape(order_data.get('username', ''))
+            first_name = html.escape(order_data.get('firstName', ''))
+            last_name = html.escape(order_data.get('lastName', ''))
             items = order_data.get('items', [])
-            total = order_data.get('total', '0.00')
-            points = order_data.get('points', 0)
+            total = html.escape(order_data.get('total', '0.00'))
+            points = html.escape(str(order_data.get('points', 0)))
+            timestamp = html.escape(order_data.get('timestamp', 'N/A'))
             
-            # Build customer info using HTML (with <br> not <br/>)
-            customer_info = f"👤 <b>Customer:</b> {user_name}<br>"
+            # Build customer info using newlines (no HTML tags needed for layout)
+            customer_info = f"👤 <b>Customer:</b> {user_name}\n"
             if username:
-                customer_info += f"🆔 <b>Username:</b> @{username}<br>"
-            customer_info += f"🔢 <b>User ID:</b> <code>{user_id}</code><br>"
+                customer_info += f"🆔 <b>Username:</b> @{username}\n"
+            customer_info += f"🔢 <b>User ID:</b> <code>{user_id}</code>\n"
             if first_name:
-                customer_info += f"📛 <b>First Name:</b> {first_name}<br>"
+                customer_info += f"📛 <b>First Name:</b> {first_name}\n"
             if last_name:
-                customer_info += f"📛 <b>Last Name:</b> {last_name}<br>"
+                customer_info += f"📛 <b>Last Name:</b> {last_name}\n"
             
             items_text = ""
             for item in items:
-                item_name = item.get('name', 'Unknown item')
-                item_price = item.get('price', 0)
-                items_text += f"  • {item_name} - ${item_price}<br>"
+                item_name = html.escape(item.get('name', 'Unknown item'))
+                item_price = html.escape(str(item.get('price', 0)))
+                items_text += f"  • {item_name} - ${item_price}\n"
             
-            order_text = f"🆕 <b>NEW ORDER!</b><br><br>"
-            order_text += customer_info
-            order_text += f"<br>📦 <b>Items:</b><br>{items_text}<br>"
-            order_text += f"💰 <b>Total:</b> ${total}<br>"
-            order_text += f"⭐ <b>Points Earned:</b> {points}<br>"
-            order_text += f"🕐 <b>Time:</b> {order_data.get('timestamp', 'N/A')}<br>"
+            order_text = (
+                f"🆕 <b>NEW ORDER!</b>\n\n"
+                f"{customer_info}\n"
+                f"📦 <b>Items:</b>\n{items_text}\n"
+                f"💰 <b>Total:</b> ${total}\n"
+                f"⭐ <b>Points Earned:</b> {points}\n"
+                f"🕐 <b>Time:</b> {timestamp}"
+            )
             
-            # Send to seller (HTML parse mode)
+            # Send to seller
             await context.bot.send_message(
                 chat_id=SELLER_CHAT_ID,
                 text=order_text,
