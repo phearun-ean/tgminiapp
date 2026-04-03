@@ -501,166 +501,166 @@
     <div id="toast" class="toast hidden"></div>
 
     <script>
-        const tg = window.Telegram.WebApp;
-        tg.expand();
-        tg.MainButton.hide();
+    const tg = window.Telegram.WebApp;
+    tg.expand();
+    tg.MainButton.hide();
 
-        // Menu data with images and categories
-        const menuItems = [
-            { 
-                id: 1, 
-                name: "Bird Nest 75ml for general", 
-                description: "100% pure bird's nests, ready to drink, self-life: 30days in fridge", 
-                price: 5,
-                category: "bird nest drinks",
-                image: "https://i.postimg.cc/rw3v9gyK/75ml.png",
-                points: 0
-            },
-            { 
-                id: 2, 
-                name: "Bird Nest 75ml 6 bottles", 
-                description: "100% pure bird's nests, ready to drink, self-life: 30days in fridge", 
-                price: 30,
-                category: "bird nest drinks",
-                image: "https://i.postimg.cc/Dw89sRhZ/75ml_6bottle.png",
-                points: 0
-            },
-            { 
-                id: 3, 
-                name: "Bird Nest 75ml 6 bottles original taste", 
-                description: "100% pure bird's nests, ready to drink, self-life: 30days in fridge", 
-                price: 30,
-                category: "bird nest drinks",
-                image: "https://i.postimg.cc/vZcJ9Cyc/75ml_6bottle_original.png",
-                points: 0
-            },
-            { 
-                id: 4, 
-                name: "Bird Nest 75ml for diabetic", 
-                description: "100% pure bird's nests, ready to drink, self-life: 30days in fridge", 
-                price: 5,
-                category: "bird nest drinks",
-                image: "https://i.postimg.cc/vZcJ9Cyc/75ml_6bottle_original.png",
-                points: 0
-            },
-            { 
-                id: 5, 
-                name: "Bird Nest 75ml 6 bottles for diabetic", 
-                description: "100% pure bird's nests, ready to drink, self-life: 30days in fridge", 
-                price: 30,
-                category: "bird nest drinks",
-                image: "https://i.postimg.cc/vZcJ9Cyc/75ml_6bottle_original.png",
-                points: 0
-            },
-            { 
-                id: 6, 
-                name: "Bird Nest 100ml", 
-                description: "100% pure bird's nests, ready to drink, self-life: 30days in fridge", 
-                price: 10,
-                category: "bird nest drinks",
-                image: "https://i.postimg.cc/XYpRFtW7/100ml.png",
-                points: 0
-            },
-            { 
-                id: 7, 
-                name: "Bird Nest 150ml ", 
-                description: "100% pure bird's nests, ready to drink, self-life: 30days in fridge", 
-                price: 12,
-                category: "bird nest drinks",
-                image: "https://i.postimg.cc/htfkxNnQ/150ml.png.png",
-                points: 0
-            },
-            { 
-                id: 8, 
-                name: "Bird Nest 200ml", 
-                description: "100% pure bird's nests, ready to drink, self-life: 30days in fridge", 
-                price: 15,
-                category: "bird nest drinks",
-                image: "https://i.postimg.cc/8s8mhCxR/200ml.png",
-                points: 0
-            },
-            { 
-                id: 9, 
-                name: "Bird Nest 250ml", 
-                description: "100% pure bird's nests, ready to drink, self-life: 30days in fridge", 
-                price: 20,
-                category: "bird nest drinks",
-                image: "https://i.postimg.cc/PNGQmq0m/250ml.png",
-                points: 0
-            },
-            { 
-                id: 10, 
-                name: "Bird Nest 500ml", 
-                description: "100% pure bird's nests, ready to drink, self-life: 30days in fridge", 
-                price: 50,
-                category: "bird nest drinks",
-                image: "https://i.postimg.cc/ZqZH0ChV/500ml.png",
-                points: 0
-            },
-            { 
-                id: 11, 
-                name: "Bird Nest 1000ml", 
-                description: "100% pure bird's nests, ready to drink, self-life: 30days in fridge", 
-                price: 100,
-                category: "bird nest drinks",
-                image: "https://i.postimg.cc/Wb1Pq1sV/1000ml.png",
-                points: 0
-            },
-            { 
-                id: 12, 
-                name: "Bird Nest Grade A 100g", 
-                description: "100% pure bird's nests, Semi-final product, self-life: 3 years in room temperature", 
-                price: 290,
-                category: "Dried bird nest",
-                image: "https://i.postimg.cc/Pq6bSyBf/Grade_A.png",
-                points: 0
-            },
-            { 
-                id: 13, 
-                name: "Bird Nest Konkat 100g", 
-                description: "100% pure bird's nests, Semi-final product, self-life: 3 years in room temperature", 
-                price: 250,
-                category: "Dried bird nest",
-                image: "https://i.postimg.cc/zXWNCP93/Konkat.png",
-                points: 0
-            },
-            { 
-                id: 14, 
-                name: "Bird Nest Num 100g", 
-                description: "100% pure bird's nests, Semi-final product, self-life: 3 years in room temperature", 
-                price: 180,
-                category: "Dried bird nest",
-                image: "https://i.postimg.cc/sXwxR035/Bird_s_Nest_Num1_100g.png",
-                points: 0
-            },
-            { 
-                id: 15, 
-                name: "Bird Nest Princess 100g", 
-                description: "100% pure bird's nests, Semi-final product, self-life: 3 years in room temperature", 
-                price: 200,
-                category: "Dried bird nest",
-                image: "",
-                points: 0
-            }
-        ];
+    // Menu data with images and categories
+    const menuItems = [
+        { 
+            id: 1, 
+            name: "Bird Nest 75ml for general", 
+            description: "100% pure bird's nests, ready to drink, self-life: 30days in fridge", 
+            price: 5,
+            category: "bird nest drinks",
+            image: "https://i.postimg.cc/rw3v9gyK/75ml.png",
+            points: 0
+        },
+        { 
+            id: 2, 
+            name: "Bird Nest 75ml 6 bottles", 
+            description: "100% pure bird's nests, ready to drink, self-life: 30days in fridge", 
+            price: 30,
+            category: "bird nest drinks",
+            image: "https://i.postimg.cc/Dw89sRhZ/75ml_6bottle.png",
+            points: 0
+        },
+        { 
+            id: 3, 
+            name: "Bird Nest 75ml 6 bottles original taste", 
+            description: "100% pure bird's nests, ready to drink, self-life: 30days in fridge", 
+            price: 30,
+            category: "bird nest drinks",
+            image: "https://i.postimg.cc/vZcJ9Cyc/75ml_6bottle_original.png",
+            points: 0
+        },
+        { 
+            id: 4, 
+            name: "Bird Nest 75ml for diabetic", 
+            description: "100% pure bird's nests, ready to drink, self-life: 30days in fridge", 
+            price: 5,
+            category: "bird nest drinks",
+            image: "https://i.postimg.cc/vZcJ9Cyc/75ml_6bottle_original.png",
+            points: 0
+        },
+        { 
+            id: 5, 
+            name: "Bird Nest 75ml 6 bottles for diabetic", 
+            description: "100% pure bird's nests, ready to drink, self-life: 30days in fridge", 
+            price: 30,
+            category: "bird nest drinks",
+            image: "https://i.postimg.cc/vZcJ9Cyc/75ml_6bottle_original.png",
+            points: 0
+        },
+        { 
+            id: 6, 
+            name: "Bird Nest 100ml", 
+            description: "100% pure bird's nests, ready to drink, self-life: 30days in fridge", 
+            price: 10,
+            category: "bird nest drinks",
+            image: "https://i.postimg.cc/XYpRFtW7/100ml.png",
+            points: 0
+        },
+        { 
+            id: 7, 
+            name: "Bird Nest 150ml ", 
+            description: "100% pure bird's nests, ready to drink, self-life: 30days in fridge", 
+            price: 12,
+            category: "bird nest drinks",
+            image: "https://i.postimg.cc/htfkxNnQ/150ml.png",
+            points: 0
+        },
+        { 
+            id: 8, 
+            name: "Bird Nest 200ml", 
+            description: "100% pure bird's nests, ready to drink, self-life: 30days in fridge", 
+            price: 15,
+            category: "bird nest drinks",
+            image: "https://i.postimg.cc/8s8mhCxR/200ml.png",
+            points: 0
+        },
+        { 
+            id: 9, 
+            name: "Bird Nest 250ml", 
+            description: "100% pure bird's nests, ready to drink, self-life: 30days in fridge", 
+            price: 20,
+            category: "bird nest drinks",
+            image: "https://i.postimg.cc/PNGQmq0m/250ml.png",
+            points: 0
+        },
+        { 
+            id: 10, 
+            name: "Bird Nest 500ml", 
+            description: "100% pure bird's nests, ready to drink, self-life: 30days in fridge", 
+            price: 50,
+            category: "bird nest drinks",
+            image: "https://i.postimg.cc/ZqZH0ChV/500ml.png",
+            points: 0
+        },
+        { 
+            id: 11, 
+            name: "Bird Nest 1000ml", 
+            description: "100% pure bird's nests, ready to drink, self-life: 30days in fridge", 
+            price: 100,
+            category: "bird nest drinks",
+            image: "https://i.postimg.cc/Wb1Pq1sV/1000ml.png",
+            points: 0
+        },
+        { 
+            id: 12, 
+            name: "Bird Nest Grade A 100g", 
+            description: "100% pure bird's nests, Semi-final product, self-life: 3 years in room temperature", 
+            price: 290,
+            category: "Dried bird nest",
+            image: "https://i.postimg.cc/Pq6bSyBf/Grade_A.png",
+            points: 0
+        },
+        { 
+            id: 13, 
+            name: "Bird Nest Konkat 100g", 
+            description: "100% pure bird's nests, Semi-final product, self-life: 3 years in room temperature", 
+            price: 250,
+            category: "Dried bird nest",
+            image: "https://i.postimg.cc/zXWNCP93/Konkat.png",
+            points: 0
+        },
+        { 
+            id: 14, 
+            name: "Bird Nest Num 100g", 
+            description: "100% pure bird's nests, Semi-final product, self-life: 3 years in room temperature", 
+            price: 180,
+            category: "Dried bird nest",
+            image: "https://i.postimg.cc/sXwxR035/Bird_s_Nest_Num1_100g.png",
+            points: 0
+        },
+        { 
+            id: 15, 
+            name: "Bird Nest Princess 100g", 
+            description: "100% pure bird's nests, Semi-final product, self-life: 3 years in room temperature", 
+            price: 200,
+            category: "Dried bird nest",
+            image: "",
+            points: 0
+        }
+    ];
 
-        // Get user data from Telegram WebApp
-        let user = {
-            id: 'guest',
-            firstName: 'Guest',
-            lastName: '',
-            username: '',
-            photoUrl: null
-        };
+    // Get user data from Telegram WebApp
+    let user = {
+        id: 'guest',
+        firstName: 'Guest',
+        lastName: '',
+        username: '',
+        photoUrl: null
+    };
 
-        // Try to get real user data from Telegram
-        if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
-            user.id = tg.initDataUnsafe.user.id || 'guest';
-            user.firstName = tg.initDataUnsafe.user.first_name || 'Guest';
-            user.lastName = tg.initDataUnsafe.user.last_name || '';
-            user.username = tg.initDataUnsafe.user.username || '';
-            user.photoUrl = tg.initDataUnsafe.user.photo_url || null;
-        } else {
+    // Try to get real user data from Telegram
+    if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
+        user.id = tg.initDataUnsafe.user.id || 'guest';
+        user.firstName = tg.initDataUnsafe.user.first_name || 'Guest';
+        user.lastName = tg.initDataUnsafe.user.last_name || '';
+        user.username = tg.initDataUnsafe.user.username || '';
+        user.photoUrl = tg.initDataUnsafe.user.photo_url || null;
+    } else {
         // Fallback: try to get from URL parameters (for testing)
         const urlParams = new URLSearchParams(window.location.search);
         if (urlParams.get('user_id')) {
@@ -669,343 +669,343 @@
         }
     }
 
-console.log('User data loaded:', user); // For debugging
+    console.log('User data loaded:', user); // For debugging
 
+    // App state
+    let cart = [];
+    let loyaltyPoints = 0;
+    let orderHistory = [];
 
+    // Load saved data
+    function loadData() {
+        const savedCart = localStorage.getItem(`cart_${user.id}`);
+        const savedPoints = localStorage.getItem(`points_${user.id}`);
+        const savedOrders = localStorage.getItem(`orders_${user.id}`);
+        
+        if (savedCart) cart = JSON.parse(savedCart);
+        if (savedPoints) loyaltyPoints = parseInt(savedPoints);
+        if (savedOrders) orderHistory = JSON.parse(savedOrders);
+        
+        updateCartCount();
+        updateCartDisplay();
+    }
 
-        // App state
-        let cart = [];
-        let loyaltyPoints = 0;
-        let orderHistory = [];
+    // Save data
+    function saveData() {
+        localStorage.setItem(`cart_${user.id}`, JSON.stringify(cart));
+        localStorage.setItem(`points_${user.id}`, loyaltyPoints);
+        localStorage.setItem(`orders_${user.id}`, JSON.stringify(orderHistory));
+    }
 
-        // Load saved data
-        function loadData() {
-            const savedCart = localStorage.getItem(`cart_${user.id}`);
-            const savedPoints = localStorage.getItem(`points_${user.id}`);
-            const savedOrders = localStorage.getItem(`orders_${user.id}`);
-            
-            if (savedCart) cart = JSON.parse(savedCart);
-            if (savedPoints) loyaltyPoints = parseInt(savedPoints);
-            if (savedOrders) orderHistory = JSON.parse(savedOrders);
-            
-            updateCartCount();
-            updateCartDisplay();
-        }
-
-        // Save data
-        function saveData() {
-            localStorage.setItem(`cart_${user.id}`, JSON.stringify(cart));
-            localStorage.setItem(`points_${user.id}`, loyaltyPoints);
-            localStorage.setItem(`orders_${user.id}`, JSON.stringify(orderHistory));
-        }
-
-        // Initialize
-        function init() {
-            console.log('Telegram WebApp user data:', tg.initDataUnsafe?.user);
-            document.getElementById('userInfo').textContent = `Welcome, ${user.firstName}!`;
-            // ... rest of your init code
+    // Initialize
+    function init() {
+        console.log('Telegram WebApp user data:', tg.initDataUnsafe?.user);
+        document.getElementById('userInfo').textContent = `Welcome, ${user.firstName}!`;
+        
+        if (user.photoUrl) {
+            document.getElementById('profileAvatar').innerHTML = 
+                `<img src="${user.photoUrl}" style="width:100%; border-radius:50%;">`;
         }
         
-            
-            updateProfileInfo();
-            renderMenu();
-            loadData();
-            simulateOrderHistory(); // For demo purposes
-        
+        updateProfileInfo();
+        renderMenu();
+        loadData();
+        simulateOrderHistory(); // For demo purposes
+    }
 
-        // Render menu grid
-        function renderMenu() {
-    const grid = document.getElementById('menuGrid');
-    const loader = document.getElementById('menuLoader');
-    
-    setTimeout(() => {
-        loader.classList.add('hidden');
-        grid.innerHTML = menuItems.map(item => {
-            // Check if item.image is a valid image URL
-            const isImageUrl = item.image && (item.image.startsWith('http') || item.image.startsWith('https') || item.image.match(/\.(jpg|jpeg|png|gif|webp)$/i));
-            
-            let imageHtml = '';
-            if (isImageUrl) {
-                imageHtml = `<img src="${item.image}" alt="${item.name}" style="width:100%; height:100%; object-fit:cover;">`;
-            } else {
-                // Fallback to emoji or text
-                imageHtml = item.image || '🍽️';
-            }
-            
-            return `
-                <div class="menu-item">
-                    <div class="item-image">${imageHtml}</div>
-                    <div class="item-details">
-                        <div class="item-header">
-                            <span class="item-name">${item.name}</span>
-                            <span class="item-price">$${item.price.toFixed(2)}</span>
-                        </div>
-                        <div class="item-description">${item.description}</div>
-                        <div class="item-controls">
-                            <div class="quantity-controls">
-                                <button class="qty-btn" onclick="adjustQuantity(${item.id}, -1)">-</button>
-                                <span class="qty-value" id="qty_${item.id}">0</span>
-                                <button class="qty-btn" onclick="adjustQuantity(${item.id}, 1)">+</button>
+    // Render menu grid
+    function renderMenu() {
+        const grid = document.getElementById('menuGrid');
+        const loader = document.getElementById('menuLoader');
+        
+        setTimeout(() => {
+            loader.classList.add('hidden');
+            grid.innerHTML = menuItems.map(item => {
+                // Check if item.image is a valid image URL
+                const isImageUrl = item.image && (item.image.startsWith('http') || item.image.startsWith('https') || item.image.match(/\.(jpg|jpeg|png|gif|webp)$/i));
+                
+                let imageHtml = '';
+                if (isImageUrl) {
+                    imageHtml = `<img src="${item.image}" alt="${item.name}" style="width:100%; height:100%; object-fit:cover;">`;
+                } else {
+                    // Fallback to emoji or text
+                    imageHtml = item.image || '🍽️';
+                }
+                
+                return `
+                    <div class="menu-item">
+                        <div class="item-image">${imageHtml}</div>
+                        <div class="item-details">
+                            <div class="item-header">
+                                <span class="item-name">${item.name}</span>
+                                <span class="item-price">$${item.price.toFixed(2)}</span>
                             </div>
-                            <button class="add-btn" onclick="addToCart(${item.id})">
-                                Add • <span id="itemPrice_${item.id}">$${item.price.toFixed(2)}</span>
-                            </button>
+                            <div class="item-description">${item.description}</div>
+                            <div class="item-controls">
+                                <div class="quantity-controls">
+                                    <button class="qty-btn" onclick="adjustQuantity(${item.id}, -1)">-</button>
+                                    <span class="qty-value" id="qty_${item.id}">0</span>
+                                    <button class="qty-btn" onclick="adjustQuantity(${item.id}, 1)">+</button>
+                                </div>
+                                <button class="add-btn" onclick="addToCart(${item.id})">
+                                    Add • <span id="itemPrice_${item.id}">$${item.price.toFixed(2)}</span>
+                                </button>
+                            </div>
                         </div>
                     </div>
-                </div>
-            `;
-        }).join('');
-    }, 500);
-}
+                `;
+            }).join('');
+        }, 500);
+    }
 
-        // Adjust quantity
-        function adjustQuantity(itemId, change) {
-            const qtyElement = document.getElementById(`qty_${itemId}`);
-            let qty = parseInt(qtyElement.textContent) + change;
-            qty = Math.max(0, Math.min(99, qty));
-            qtyElement.textContent = qty;
-            
-            // Update price display
-            const item = menuItems.find(i => i.id === itemId);
-            const priceElement = document.getElementById(`itemPrice_${itemId}`);
-            priceElement.textContent = `$${(item.price * (qty || 1)).toFixed(2)}`;
+    // Adjust quantity
+    function adjustQuantity(itemId, change) {
+        const qtyElement = document.getElementById(`qty_${itemId}`);
+        let qty = parseInt(qtyElement.textContent) + change;
+        qty = Math.max(0, Math.min(99, qty));
+        qtyElement.textContent = qty;
+        
+        // Update price display
+        const item = menuItems.find(i => i.id === itemId);
+        const priceElement = document.getElementById(`itemPrice_${itemId}`);
+        priceElement.textContent = `$${(item.price * (qty || 1)).toFixed(2)}`;
+    }
+
+    // Add to cart
+    function addToCart(itemId) {
+        const qty = parseInt(document.getElementById(`qty_${itemId}`).textContent) || 1;
+        const item = menuItems.find(i => i.id === itemId);
+        
+        for (let i = 0; i < qty; i++) {
+            cart.push({...item});
         }
+        
+        // Reset quantity display
+        document.getElementById(`qty_${itemId}`).textContent = '0';
+        document.getElementById(`itemPrice_${itemId}`).textContent = `$${item.price.toFixed(2)}`;
+        
+        updateCartCount();
+        updateCartDisplay();
+        saveData();
+        
+        // Haptic feedback
+        tg.HapticFeedback.impactOccurred('light');
+        
+        // Show toast
+        showToast(`Added ${qty} × ${item.name} to cart!`);
+    }
 
-        // Add to cart
-        function addToCart(itemId) {
-            const qty = parseInt(document.getElementById(`qty_${itemId}`).textContent) || 1;
-            const item = menuItems.find(i => i.id === itemId);
-            
-            for (let i = 0; i < qty; i++) {
-                cart.push({...item});
-            }
-            
-            // Reset quantity display
-            document.getElementById(`qty_${itemId}`).textContent = '0';
-            document.getElementById(`itemPrice_${itemId}`).textContent = `$${item.price.toFixed(2)}`;
-            
+    // Update cart count
+    function updateCartCount() {
+        const count = cart.length;
+        const cartTab = document.getElementById('cartTabCount');
+        
+        if (count > 0) {
+            cartTab.textContent = `(${count})`;
+            cartTab.classList.remove('hidden');
+        } else {
+            cartTab.classList.add('hidden');
+        }
+    }
+
+    // Update cart display
+    function updateCartDisplay() {
+        const cartDiv = document.getElementById('cartItems');
+        const emptyCart = document.getElementById('emptyCart');
+        const cartSummary = document.getElementById('cartSummary');
+        
+        if (cart.length === 0) {
+            cartDiv.innerHTML = '';
+            emptyCart.classList.remove('hidden');
+            cartSummary.classList.add('hidden');
+            return;
+        }
+        
+        emptyCart.classList.add('hidden');
+        cartSummary.classList.remove('hidden');
+        
+        // Group cart items
+        const grouped = cart.reduce((acc, item) => {
+            acc[item.id] = acc[item.id] || { item, count: 0 };
+            acc[item.id].count++;
+            return acc;
+        }, {});
+        
+        cartDiv.innerHTML = Object.values(grouped).map(({item, count}) => `
+            <div class="cart-item">
+                <div class="cart-item-info">
+                    <h4>${item.name} ${count > 1 ? `× ${count}` : ''}</h4>
+                    <span class="cart-item-price">$${(item.price * count).toFixed(2)}</span>
+                </div>
+                <div class="cart-item-controls">
+                    <button class="remove-btn" onclick="removeFromCart(${item.id})">Remove</button>
+                </div>
+            </div>
+        `).join('');
+        
+        updateCartTotal();
+    }
+
+    // Remove from cart
+    function removeFromCart(itemId) {
+        const index = cart.findIndex(item => item.id === itemId);
+        if (index !== -1) {
+            cart.splice(index, 1);
             updateCartCount();
             updateCartDisplay();
             saveData();
-            
-            // Haptic feedback
-            tg.HapticFeedback.impactOccurred('light');
-            
-            // Show toast
-            showToast(`Added ${qty} × ${item.name} to cart!`);
-        }
-
-        // Update cart count
-        function updateCartCount() {
-            const count = cart.length;
-            const cartTab = document.getElementById('cartTabCount');
-            
-            if (count > 0) {
-                cartTab.textContent = `(${count})`;
-                cartTab.classList.remove('hidden');
-            } else {
-                cartTab.classList.add('hidden');
-            }
-        }
-
-        // Update cart display
-        function updateCartDisplay() {
-            const cartDiv = document.getElementById('cartItems');
-            const emptyCart = document.getElementById('emptyCart');
-            const cartSummary = document.getElementById('cartSummary');
-            
-            if (cart.length === 0) {
-                cartDiv.innerHTML = '';
-                emptyCart.classList.remove('hidden');
-                cartSummary.classList.add('hidden');
-                return;
-            }
-            
-            emptyCart.classList.add('hidden');
-            cartSummary.classList.remove('hidden');
-            
-            // Group cart items
-            const grouped = cart.reduce((acc, item) => {
-                acc[item.id] = acc[item.id] || { item, count: 0 };
-                acc[item.id].count++;
-                return acc;
-            }, {});
-            
-            cartDiv.innerHTML = Object.values(grouped).map(({item, count}) => `
-                <div class="cart-item">
-                    <div class="cart-item-info">
-                        <h4>${item.name} ${count > 1 ? `× ${count}` : ''}</h4>
-                        <span class="cart-item-price">$${(item.price * count).toFixed(2)}</span>
-                    </div>
-                    <div class="cart-item-controls">
-                        <button class="remove-btn" onclick="removeFromCart(${item.id})">Remove</button>
-                    </div>
-                </div>
-            `).join('');
-            
-            updateCartTotal();
-        }
-
-        // Remove from cart
-        function removeFromCart(itemId) {
-            const index = cart.findIndex(item => item.id === itemId);
-            if (index !== -1) {
-                cart.splice(index, 1);
-                updateCartCount();
-                updateCartDisplay();
-                saveData();
-                tg.HapticFeedback.notificationOccurred('success');
-            }
-        }
-
-        // Update cart total
-        function updateCartTotal() {
-            const total = cart.reduce((sum, item) => sum + item.price, 0);
-            document.getElementById('cartTotal').textContent = `$${total.toFixed(2)}`;
-        }
-
-        // Update profile info
-        function updateProfileInfo() {
-            document.getElementById('profileInfo').innerHTML = `
-                <p><strong>${user.firstName} ${user.lastName}</strong></p>
-                <p>@${user.username || 'no username'}</p>
-                <p>Member since: ${new Date().toLocaleDateString()}</p>
-            `;
-            
-            document.getElementById('pointsDisplay').querySelector('.points-value').textContent = loyaltyPoints;
-        }
-
-        // Simulate order history for demo
-        function simulateOrderHistory() {
-            if (orderHistory.length === 0) {
-                orderHistory = [
-                    {
-                        id: 'ORD001',
-                        date: new Date(Date.now() - 86400000).toLocaleDateString(),
-                        items: ['Classic Durger', 'Fries', 'Milkshake'],
-                        total: 15.97,
-                        status: 'Delivered',
-                        points: 20
-                    },
-                    {
-                        id: 'ORD002',
-                        date: new Date(Date.now() - 172800000).toLocaleDateString(),
-                        items: ['Double Durger', 'Onion Rings'],
-                        total: 13.98,
-                        status: 'Delivered',
-                        points: 18
-                    }
-                ];
-            }
-            
-            const historyDiv = document.getElementById('orderHistory');
-            historyDiv.innerHTML = orderHistory.map(order => `
-                <div class="order-card">
-                    <div class="order-header">
-                        <span><strong>${order.id}</strong></span>
-                        <span class="status">✓ ${order.status}</span>
-                    </div>
-                    <div class="order-items">${order.items.join(' • ')}</div>
-                    <div class="order-total">Total: $${order.total.toFixed(2)}</div>
-                    <small>Earned ${order.points} points</small>
-                </div>
-            `).join('');
-        }
-
-        // Checkout function
-        function checkout() {
-            if (cart.length === 0) {
-                showToast('Your cart is empty!');
-                return;
-            }
-            
-            const total = cart.reduce((sum, item) => sum + item.price, 0);
-            const pointsEarned = cart.reduce((sum, item) => sum + (item.points || 0), 0);
-            
-            // Create order
-            const order = {
-                id: 'ORD' + Math.floor(Math.random() * 1000),
-                date: new Date().toLocaleDateString(),
-                items: cart.map(item => item.name),
-                total: total,
-                status: 'Confirmed',
-                points: pointsEarned
-            };
-            
-            // Add to history and update points
-            orderHistory.unshift(order);
-            loyaltyPoints += pointsEarned;
-            
-            // Prepare order data for bot
-            const orderData = {
-                userId: user.id,
-                userName: `${user.firstName} ${user.lastName}`.trim(),
-                username: user.username || 'no_username',
-                firstName: user.firstName,
-                lastName: user.lastName,
-                items: cart.map(item => ({
-                name: item.name,
-                price: item.price
-                })),
-                total: total.toFixed(2),
-                points: pointsEarned,
-                totalPoints: loyaltyPoints,
-                timestamp: new Date().toISOString()
-            };
-            
-            // Clear cart
-            cart = [];
-            updateCartCount();
-            updateCartDisplay();
-            updateProfileInfo();
-            saveData();
-            
-            // Send data to bot
-            tg.sendData(JSON.stringify(orderData));
-            
-            // Show success message
-            showToast(`Order placed! Earned ${pointsEarned} points!`, 3000);
-            
-            // Haptic feedback
             tg.HapticFeedback.notificationOccurred('success');
         }
+    }
 
-        // Switch tabs
-        function switchTab(tabName) {
-            // Update tab buttons
-            document.querySelectorAll('.tab').forEach(tab => {
-                tab.classList.remove('active');
-            });
-            event.target.classList.add('active');
-            
-            // Update sections
-            document.querySelectorAll('.section').forEach(section => {
-                section.classList.remove('active');
-            });
-            document.getElementById(`${tabName}Section`).classList.add('active');
-            
-            // Refresh displays
-            if (tabName === 'cart') {
-                updateCartDisplay();
-            } else if (tabName === 'profile') {
-                updateProfileInfo();
-                simulateOrderHistory();
-            }
+    // Update cart total
+    function updateCartTotal() {
+        const total = cart.reduce((sum, item) => sum + item.price, 0);
+        document.getElementById('cartTotal').textContent = `$${total.toFixed(2)}`;
+    }
+
+    // Update profile info
+    function updateProfileInfo() {
+        document.getElementById('profileInfo').innerHTML = `
+            <p><strong>${user.firstName} ${user.lastName}</strong></p>
+            <p>@${user.username || 'no username'}</p>
+            <p>Member since: ${new Date().toLocaleDateString()}</p>
+        `;
+        
+        document.getElementById('pointsDisplay').querySelector('.points-value').textContent = loyaltyPoints;
+    }
+
+    // Simulate order history for demo
+    function simulateOrderHistory() {
+        if (orderHistory.length === 0) {
+            orderHistory = [
+                {
+                    id: 'ORD001',
+                    date: new Date(Date.now() - 86400000).toLocaleDateString(),
+                    items: ['Classic Durger', 'Fries', 'Milkshake'],
+                    total: 15.97,
+                    status: 'Delivered',
+                    points: 20
+                },
+                {
+                    id: 'ORD002',
+                    date: new Date(Date.now() - 172800000).toLocaleDateString(),
+                    items: ['Double Durger', 'Onion Rings'],
+                    total: 13.98,
+                    status: 'Delivered',
+                    points: 18
+                }
+            ];
         }
+        
+        const historyDiv = document.getElementById('orderHistory');
+        historyDiv.innerHTML = orderHistory.map(order => `
+            <div class="order-card">
+                <div class="order-header">
+                    <span><strong>${order.id}</strong></span>
+                    <span class="status">✓ ${order.status}</span>
+                </div>
+                <div class="order-items">${order.items.join(' • ')}</div>
+                <div class="order-total">Total: $${order.total.toFixed(2)}</div>
+                <small>Earned ${order.points} points</small>
+            </div>
+        `).join('');
+    }
 
-        // Show toast notification
-        function showToast(message, duration = 2000) {
-            const toast = document.getElementById('toast');
-            toast.textContent = message;
-            toast.classList.remove('hidden');
-            
-            setTimeout(() => {
-                toast.classList.add('hidden');
-            }, duration);
+    // Checkout function
+    function checkout() {
+        if (cart.length === 0) {
+            showToast('Your cart is empty!');
+            return;
         }
+        
+        const total = cart.reduce((sum, item) => sum + item.price, 0);
+        const pointsEarned = cart.reduce((sum, item) => sum + (item.points || 0), 0);
+        
+        // Create order
+        const order = {
+            id: 'ORD' + Math.floor(Math.random() * 1000),
+            date: new Date().toLocaleDateString(),
+            items: cart.map(item => item.name),
+            total: total,
+            status: 'Confirmed',
+            points: pointsEarned
+        };
+        
+        // Add to history and update points
+        orderHistory.unshift(order);
+        loyaltyPoints += pointsEarned;
+        
+        // Prepare order data for bot
+        const orderData = {
+            userId: user.id,
+            userName: `${user.firstName} ${user.lastName}`.trim(),
+            username: user.username || 'no_username',
+            firstName: user.firstName,
+            lastName: user.lastName,
+            items: cart.map(item => ({
+                name: item.name,
+                price: item.price
+            })),
+            total: total.toFixed(2),
+            points: pointsEarned,
+            totalPoints: loyaltyPoints,
+            timestamp: new Date().toISOString()
+        };
+        
+        // Clear cart
+        cart = [];
+        updateCartCount();
+        updateCartDisplay();
+        updateProfileInfo();
+        saveData();
+        
+        // Send data to bot
+        tg.sendData(JSON.stringify(orderData));
+        
+        // Show success message
+        showToast(`Order placed! Earned ${pointsEarned} points!`, 3000);
+        
+        // Haptic feedback
+        tg.HapticFeedback.notificationOccurred('success');
+    }
 
-        // Start the app
-        init();
-    </script>
+    // Switch tabs
+    function switchTab(tabName) {
+        // Update tab buttons
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.classList.remove('active');
+        });
+        event.target.classList.add('active');
+        
+        // Update sections
+        document.querySelectorAll('.section').forEach(section => {
+            section.classList.remove('active');
+        });
+        document.getElementById(`${tabName}Section`).classList.add('active');
+        
+        // Refresh displays
+        if (tabName === 'cart') {
+            updateCartDisplay();
+        } else if (tabName === 'profile') {
+            updateProfileInfo();
+            simulateOrderHistory();
+        }
+    }
+
+    // Show toast notification
+    function showToast(message, duration = 2000) {
+        const toast = document.getElementById('toast');
+        toast.textContent = message;
+        toast.classList.remove('hidden');
+        
+        setTimeout(() => {
+            toast.classList.add('hidden');
+        }, duration);
+    }
+
+    // Start the app
+    init();
+</script>
 </body>
 </html>
