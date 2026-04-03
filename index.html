@@ -644,14 +644,34 @@
             }
         ];
 
-        // User data
+        // Get user data from Telegram WebApp
         let user = {
-            id: tg.initDataUnsafe?.user?.id || 'guest',
-            firstName: tg.initDataUnsafe?.user?.first_name || 'Guest',
-            lastName: tg.initDataUnsafe?.user?.last_name || '',
-            username: tg.initDataUnsafe?.user?.username || '',
-            photoUrl: tg.initDataUnsafe?.user?.photo_url || null
+            id: 'guest',
+            firstName: 'Guest',
+            lastName: '',
+            username: '',
+            photoUrl: null
         };
+
+        // Try to get real user data from Telegram
+        if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
+            user.id = tg.initDataUnsafe.user.id || 'guest';
+            user.firstName = tg.initDataUnsafe.user.first_name || 'Guest';
+            user.lastName = tg.initDataUnsafe.user.last_name || '';
+            user.username = tg.initDataUnsafe.user.username || '';
+            user.photoUrl = tg.initDataUnsafe.user.photo_url || null;
+        } else {
+        // Fallback: try to get from URL parameters (for testing)
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('user_id')) {
+            user.id = urlParams.get('user_id');
+            user.firstName = urlParams.get('first_name') || 'User';
+        }
+    }
+
+console.log('User data loaded:', user); // For debugging
+
+
 
         // App state
         let cart = [];
