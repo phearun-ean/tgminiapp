@@ -4,11 +4,10 @@ import os
 from telegram import Update, KeyboardButton, ReplyKeyboardMarkup, WebAppInfo
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes
 from dotenv import load_dotenv
-from telegram.helpers import escape_markdown
 
 load_dotenv()
 BOT_TOKEN = os.getenv("BOT_TOKEN")
-SELLER_CHAT_ID = "455774531"   # Must be your numeric chat ID (get from @userinfobot)
+SELLER_CHAT_ID = "455774531"   # Your numeric chat ID
 YOUR_WEB_APP_URL = "https://phearun-ean.github.io/tgminiapp/"
 
 logging.basicConfig(
@@ -34,69 +33,59 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def handle_order(update: Update, context: ContextTypes.DEFAULT_TYPE):
     message = update.effective_message
     
-    logging.info(f"Received update: {update}")
-    
     if message and message.web_app_data:
         try:
             raw_data = message.web_app_data.data
-            logging.info(f"Raw web_app_data: {raw_data}")
-            
             order_data = json.loads(raw_data)
-            logging.info(f"Parsed order_data: {order_data}")
             
-            # Extract all user fields (same as sent from mini app)
+            # Extract user info
             user_id = order_data.get('userId', 'Unknown')
             user_name = order_data.get('userName', 'Guest')
             username = order_data.get('username', '')
             first_name = order_data.get('firstName', '')
             last_name = order_data.get('lastName', '')
-            
             items = order_data.get('items', [])
             total = order_data.get('total', '0.00')
             points = order_data.get('points', 0)
             
-            if not isinstance(items, list):
-                raise ValueError(f"Items is not a list: {type(items)}")
-            
-            # Build customer info with proper escaping (MarkdownV2)
-            customer_info = f"👤 *Customer:* {escape_markdown(user_name, version=2)}\n"
+            # Build customer info using HTML (no escaping headaches)
+            customer_info = f"👤 <b>Customer:</b> {user_name}<br/>"
             if username:
-                customer_info += f"🆔 *Username:* @{escape_markdown(username, version=2)}\n"
-            customer_info += f"🔢 *User ID:* `{escape_markdown(str(user_id), version=2)}`\n"
+                customer_info += f"🆔 <b>Username:</b> @{username}<br/>"
+            customer_info += f"🔢 <b>User ID:</b> <code>{user_id}</code><br/>"
             if first_name:
-                customer_info += f"📛 *First Name:* {escape_markdown(first_name, version=2)}\n"
+                customer_info += f"📛 <b>First Name:</b> {first_name}<br/>"
             if last_name:
-                customer_info += f"📛 *Last Name:* {escape_markdown(last_name, version=2)}\n"
+                customer_info += f"📛 <b>Last Name:</b> {last_name}<br/>"
             
             items_text = ""
             for item in items:
                 item_name = item.get('name', 'Unknown item')
                 item_price = item.get('price', 0)
-                items_text += f"  • {escape_markdown(item_name, version=2)} - ${item_price}\n"
+                items_text += f"  • {item_name} - ${item_price}<br/>"
             
-            order_text = f"🆕 *NEW ORDER!*\n\n"
+            order_text = f"🆕 <b>NEW ORDER!</b><br/><br/>"
             order_text += customer_info
-            order_text += f"\n📦 *Items:*\n{items_text}\n"
-            order_text += f"💰 *Total:* ${total}\n"
-            order_text += f"⭐ *Points Earned:* {points}\n"
-            order_text += f"🕐 *Time:* {order_data.get('timestamp', 'N/A')}\n"
+            order_text += f"<br/>📦 <b>Items:</b><br/>{items_text}<br/>"
+            order_text += f"💰 <b>Total:</b> ${total}<br/>"
+            order_text += f"⭐ <b>Points Earned:</b> {points}<br/>"
+            order_text += f"🕐 <b>Time:</b> {order_data.get('timestamp', 'N/A')}<br/>"
             
-            # Send to seller
+            # Send to seller (HTML parse mode)
             await context.bot.send_message(
                 chat_id=SELLER_CHAT_ID,
                 text=order_text,
-                parse_mode="MarkdownV2"
+                parse_mode="HTML"
             )
             
             # Confirm to customer
-            customer_name_escaped = escape_markdown(user_name, version=2)
             await update.message.reply_text(
-                f"✅ *Order Confirmed, {customer_name_escaped}!*\n\n"
+                f"✅ <b>Order Confirmed, {user_name}!</b>\n\n"
                 f"Thank you for your order!\n"
                 f"Total: ${total}\n"
                 f"You earned {points} loyalty points 🎉\n\n"
                 f"We'll notify you when your order is ready.",
-                parse_mode="MarkdownV2"
+                parse_mode="HTML"
             )
             
             logging.info(f"Order from {user_name} (ID: {user_id}): ${total}")
