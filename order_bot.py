@@ -1,13 +1,14 @@
 import logging
 import json
 import os
+from datetime import datetime
 from telegram import Update, KeyboardButton, ReplyKeyboardMarkup, WebAppInfo, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes, CallbackQueryHandler
 from dotenv import load_dotenv
 
 load_dotenv()
 BOT_TOKEN = os.getenv("BOT_TOKEN")
-SELLER_CHAT_ID = "455774531"   # Your numeric chat ID
+SELLER_CHAT_ID = "455774531"   # Your numeric chat ID (get from @userinfobot)
 YOUR_WEB_APP_URL = "https://phearun-ean.github.io/tgminiapp/"
 
 logging.basicConfig(
@@ -53,14 +54,14 @@ async def handle_order(update: Update, context: ContextTypes.DEFAULT_TYPE):
             points = order_data.get('points', 0)
             timestamp = order_data.get('timestamp', 'N/A')
             
-            # Store for later reply
+            # Store for later reply (use current timestamp for unique order ID)
             order_storage[user_id] = {
                 'chat_id': buyer_chat_id,
                 'user_name': user_name,
-                'order_id': f"ORD_{int(timestamp) if timestamp != 'N/A' else 0}"
+                'order_id': f"ORD_{user_id}_{int(datetime.now().timestamp())}"
             }
             
-            # Build order text
+            # Build customer info
             customer_info = f"👤 <b>Customer:</b> {user_name}\n"
             if username:
                 customer_info += f"🆔 <b>Username:</b> @{username}\n"
@@ -85,7 +86,7 @@ async def handle_order(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 f"🕐 <b>Time:</b> {timestamp}"
             )
             
-            # Create inline keyboard for seller
+            # Inline keyboard for seller
             keyboard = InlineKeyboardMarkup([
                 [InlineKeyboardButton("💬 Reply to Customer", callback_data=f"reply_{user_id}")],
                 [InlineKeyboardButton("✅ Mark as Ready", callback_data=f"ready_{user_id}")]
@@ -125,7 +126,6 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if data.startswith("reply_"):
         user_id = data.split("_")[1]
         if user_id in order_storage:
-            # Ask seller to type reply message
             context.user_data['reply_to'] = user_id
             await query.edit_message_reply_markup(reply_markup=None)  # remove buttons
             await query.message.reply_text(
@@ -140,7 +140,6 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if user_id in order_storage:
             buyer_chat_id = order_storage[user_id]['chat_id']
             user_name = order_storage[user_id]['user_name']
-            # Notify customer
             await context.bot.send_message(
                 chat_id=buyer_chat_id,
                 text=f"🍽️ <b>Your order is ready for pickup!</b>\n\n"
@@ -149,7 +148,6 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
                      f"⏰ Opening hours: 9AM - 9PM",
                 parse_mode="HTML"
             )
-            # Update seller
             await query.edit_message_reply_markup(reply_markup=None)
             await query.message.reply_text(f"✅ Sent 'order ready' notification to {user_name}.")
             logging.info(f"Notified {user_name} (ID: {user_id}) that order is ready.")
@@ -170,7 +168,6 @@ async def forward_reply(update: Update, context: ContextTypes.DEFAULT_TYPE):
     buyer_chat_id = order_storage[user_id]['chat_id']
     user_name = order_storage[user_id]['user_name']
     
-    # Forward the message (text or media)
     try:
         if update.message.text:
             await context.bot.send_message(
