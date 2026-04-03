@@ -7,6 +7,7 @@ import os
 from dotenv import load_dotenv
 load_dotenv()
 BOT_TOKEN = os.getenv("BOT_TOKEN")
+from telegram.helpers import escape_markdown
 
 # ========== CONFIGURATION ==========
       # Your bot token from Step 1
