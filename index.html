@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Bird Nest House - Order Now!</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
@@ -26,7 +26,7 @@
             background: var(--tg-theme-bg-color, #ffffff);
             color: var(--tg-theme-text-color, #333);
             min-height: 100vh;
-            padding-bottom: 80px;
+            padding-bottom: 90px; /* Space for fixed cart summary */
         }
 
         /* Header Styles */
@@ -58,7 +58,7 @@
             font-size: 0.9rem;
         }
 
-        /* Tabs Navigation */
+        /* Main Tabs (Menu, Cart, Profile) */
         .tabs {
             display: flex;
             background: var(--tg-theme-secondary-bg-color, #f5f5f5);
@@ -83,10 +83,35 @@
             color: white;
         }
 
+        /* Category filters inside Menu section */
+        .category-filters {
+            display: flex;
+            gap: 10px;
+            margin: 15px 15px 10px 15px;
+            overflow-x: auto;
+            padding-bottom: 5px;
+        }
+
+        .filter-btn {
+            padding: 8px 18px;
+            border-radius: 30px;
+            background: var(--tg-theme-secondary-bg-color, #f0f0f0);
+            border: none;
+            font-weight: 500;
+            white-space: nowrap;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .filter-btn.active {
+            background: var(--primary);
+            color: white;
+        }
+
         /* Content Sections */
         .section {
             display: none;
-            padding: 15px;
+            padding: 0 15px 15px 15px;
         }
 
         .section.active {
@@ -115,12 +140,19 @@
 
         .item-image {
             width: 100%;
-            height: 195px;
-            background: linear-gradient(45deg, #ffdab9, #ffe4b5);
+            height: 180px;
+            background: #f0f0f0;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 4rem;
+            color: #888;
+        }
+
+        .item-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
 
         .item-details {
@@ -147,8 +179,9 @@
 
         .item-description {
             color: var(--tg-theme-hint-color, #666);
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             margin-bottom: 15px;
+            line-height: 1.4;
         }
 
         .item-controls {
@@ -167,8 +200,8 @@
         }
 
         .qty-btn {
-            width: 30px;
-            height: 30px;
+            width: 32px;
+            height: 32px;
             border-radius: 50%;
             border: none;
             background: var(--primary);
@@ -178,18 +211,19 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            font-size: 1.2rem;
         }
 
-        .qty-btn:disabled {
-            background: #ccc;
-            cursor: not-allowed;
+        .qty-btn:active {
+            transform: scale(0.95);
         }
 
         .qty-value {
             font-weight: 600;
-            min-width: 20px;
+            min-width: 25px;
             text-align: center;
         }
+
         .add-btn {
             background: var(--primary);
             color: white;
@@ -201,7 +235,7 @@
             transition: background 0.3s;
         }
 
-        .add-btn:hover {
+        .add-btn:active {
             background: var(--primary-dark);
         }
 
@@ -235,9 +269,10 @@
             background: var(--danger);
             color: white;
             border: none;
-            padding: 5px 10px;
-            border-radius: 15px;
+            padding: 8px 16px;
+            border-radius: 20px;
             cursor: pointer;
+            font-weight: 500;
         }
 
         /* Profile Styles */
@@ -260,6 +295,13 @@
             justify-content: center;
             font-size: 2.5rem;
             color: white;
+            overflow: hidden;
+        }
+
+        .profile-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
 
         .profile-info p {
@@ -316,19 +358,20 @@
             font-weight: 600;
         }
 
-        /* Cart Summary */
+        /* Cart Summary (Fixed Bottom) */
         .cart-summary {
             position: fixed;
             bottom: 0;
             left: 0;
             right: 0;
             background: var(--tg-theme-secondary-bg-color, #f5f5f5);
-            padding: 15px;
+            padding: 15px 20px;
             border-radius: 30px 30px 0 0;
             box-shadow: 0 -5px 20px rgba(0,0,0,0.1);
             display: flex;
             justify-content: space-between;
             align-items: center;
+            z-index: 100;
         }
 
         .cart-total {
@@ -345,16 +388,16 @@
             background: var(--primary);
             color: white;
             border: none;
-            padding: 15px 30px;
+            padding: 12px 28px;
             border-radius: 30px;
             font-weight: 600;
-            font-size: 1.1rem;
+            font-size: 1rem;
             cursor: pointer;
             transition: transform 0.2s;
         }
 
         .checkout-btn:active {
-            transform: scale(0.95);
+            transform: scale(0.96);
         }
 
         .empty-cart {
@@ -372,7 +415,7 @@
         .loyalty-banner {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            padding: 20px;
+            padding: 15px 20px;
             border-radius: 20px;
             margin: 15px 0;
             display: flex;
@@ -384,7 +427,7 @@
             background: white;
             color: #764ba2;
             border: none;
-            padding: 10px 20px;
+            padding: 8px 18px;
             border-radius: 25px;
             font-weight: 600;
             cursor: pointer;
@@ -416,14 +459,15 @@
             right: 20px;
             background: var(--primary);
             color: white;
-            padding: 15px;
-            border-radius: 25px;
+            padding: 12px;
+            border-radius: 30px;
             text-align: center;
-            animation: slideUp 0.3s;
+            animation: fadeInUp 0.3s;
             z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
         }
 
-        @keyframes slideUp {
+        @keyframes fadeInUp {
             from {
                 transform: translateY(100%);
                 opacity: 0;
@@ -443,9 +487,9 @@
     </div>
 
     <div class="tabs">
-        <div class="tab active" onclick="switchTab('menu')">🍔 Menu</div>
-        <div class="tab" onclick="switchTab('cart')">🛒 Cart <span id="cartTabCount" class="hidden">(0)</span></div>
-        <div class="tab" onclick="switchTab('profile')">👤 Profile</div>
+        <div class="tab active" data-tab="menu">🍔 Menu</div>
+        <div class="tab" data-tab="cart">🛒 Cart <span id="cartTabCount" class="hidden">(0)</span></div>
+        <div class="tab" data-tab="profile">👤 Profile</div>
     </div>
 
     <!-- Menu Section -->
@@ -453,9 +497,15 @@
         <div class="loyalty-banner">
             <div>
                 <strong>🎁 Loyalty Rewards</strong>
-                <p>Earn points with every order!</p>
+                <p>Earn 1 point per $1 spent!</p>
             </div>
             <button onclick="switchTab('profile')">View Points</button>
+        </div>
+        <!-- Category filters inside menu -->
+        <div class="category-filters" id="categoryFilters">
+            <button class="filter-btn active" data-cat="all">All</button>
+            <button class="filter-btn" data-cat="bird nest drinks">🥤 Bird Nest Drinks</button>
+            <button class="filter-btn" data-cat="Dried bird nest">🥚 Dried Bird Nest</button>
         </div>
         <div id="menuLoader" class="spinner"></div>
         <div id="menuGrid" class="menu-grid"></div>
@@ -467,7 +517,7 @@
         <div id="emptyCart" class="empty-cart">
             🛒
             <p>Your cart is empty</p>
-            <p>Add your health flavor!</p>
+            <p>Add some healthy bird nest products!</p>
         </div>
     </div>
 
@@ -483,9 +533,10 @@
         <div class="points-badge" id="pointsDisplay">
             <span class="points-value">0</span>
             <span>Loyalty Points</span>
+            <small style="display:block; margin-top:5px;">(1 point = $1 spent)</small>
         </div>
 
-        <h3>📋 Recent Orders</h3>
+        <h3>📋 Your Orders</h3>
         <div id="orderHistory"></div>
     </div>
 
@@ -501,511 +552,377 @@
     <div id="toast" class="toast hidden"></div>
 
     <script>
-    const tg = window.Telegram.WebApp;
-    tg.expand();
-    tg.MainButton.hide();
+        const tg = window.Telegram.WebApp;
+        tg.expand();
+        tg.MainButton.hide();
 
-    // Menu data with images and categories
-    const menuItems = [
-        { 
-            id: 1, 
-            name: "Bird Nest 75ml for general", 
-            description: "100% pure bird's nests, ready to drink, self-life: 30days in fridge", 
-            price: 5,
-            category: "bird nest drinks",
-            image: "https://i.postimg.cc/rw3v9gyK/75ml.png",
-            points: 0
-        },
-        { 
-            id: 2, 
-            name: "Bird Nest 75ml 6 bottles", 
-            description: "100% pure bird's nests, ready to drink, self-life: 30days in fridge", 
-            price: 30,
-            category: "bird nest drinks",
-            image: "https://i.postimg.cc/Dw89sRhZ/75ml_6bottle.png",
-            points: 0
-        },
-        { 
-            id: 3, 
-            name: "Bird Nest 75ml 6 bottles original taste", 
-            description: "100% pure bird's nests, ready to drink, self-life: 30days in fridge", 
-            price: 30,
-            category: "bird nest drinks",
-            image: "https://i.postimg.cc/vZcJ9Cyc/75ml_6bottle_original.png",
-            points: 0
-        },
-        { 
-            id: 4, 
-            name: "Bird Nest 75ml for diabetic", 
-            description: "100% pure bird's nests, ready to drink, self-life: 30days in fridge", 
-            price: 5,
-            category: "bird nest drinks",
-            image: "https://i.postimg.cc/vZcJ9Cyc/75ml_6bottle_original.png",
-            points: 0
-        },
-        { 
-            id: 5, 
-            name: "Bird Nest 75ml 6 bottles for diabetic", 
-            description: "100% pure bird's nests, ready to drink, self-life: 30days in fridge", 
-            price: 30,
-            category: "bird nest drinks",
-            image: "https://i.postimg.cc/vZcJ9Cyc/75ml_6bottle_original.png",
-            points: 0
-        },
-        { 
-            id: 6, 
-            name: "Bird Nest 100ml", 
-            description: "100% pure bird's nests, ready to drink, self-life: 30days in fridge", 
-            price: 10,
-            category: "bird nest drinks",
-            image: "https://i.postimg.cc/XYpRFtW7/100ml.png",
-            points: 0
-        },
-        { 
-            id: 7, 
-            name: "Bird Nest 150ml ", 
-            description: "100% pure bird's nests, ready to drink, self-life: 30days in fridge", 
-            price: 12,
-            category: "bird nest drinks",
-            image: "https://i.postimg.cc/htfkxNnQ/150ml.png",
-            points: 0
-        },
-        { 
-            id: 8, 
-            name: "Bird Nest 200ml", 
-            description: "100% pure bird's nests, ready to drink, self-life: 30days in fridge", 
-            price: 15,
-            category: "bird nest drinks",
-            image: "https://i.postimg.cc/8s8mhCxR/200ml.png",
-            points: 0
-        },
-        { 
-            id: 9, 
-            name: "Bird Nest 250ml", 
-            description: "100% pure bird's nests, ready to drink, self-life: 30days in fridge", 
-            price: 20,
-            category: "bird nest drinks",
-            image: "https://i.postimg.cc/PNGQmq0m/250ml.png",
-            points: 0
-        },
-        { 
-            id: 10, 
-            name: "Bird Nest 500ml", 
-            description: "100% pure bird's nests, ready to drink, self-life: 30days in fridge", 
-            price: 50,
-            category: "bird nest drinks",
-            image: "https://i.postimg.cc/ZqZH0ChV/500ml.png",
-            points: 0
-        },
-        { 
-            id: 11, 
-            name: "Bird Nest 1000ml", 
-            description: "100% pure bird's nests, ready to drink, self-life: 30days in fridge", 
-            price: 100,
-            category: "bird nest drinks",
-            image: "https://i.postimg.cc/Wb1Pq1sV/1000ml.png",
-            points: 0
-        },
-        { 
-            id: 12, 
-            name: "Bird Nest Grade A 100g", 
-            description: "100% pure bird's nests, Semi-final product, self-life: 3 years in room temperature", 
-            price: 290,
-            category: "Dried bird nest",
-            image: "https://i.postimg.cc/Pq6bSyBf/Grade_A.png",
-            points: 0
-        },
-        { 
-            id: 13, 
-            name: "Bird Nest Konkat 100g", 
-            description: "100% pure bird's nests, Semi-final product, self-life: 3 years in room temperature", 
-            price: 250,
-            category: "Dried bird nest",
-            image: "https://i.postimg.cc/zXWNCP93/Konkat.png",
-            points: 0
-        },
-        { 
-            id: 14, 
-            name: "Bird Nest Num 100g", 
-            description: "100% pure bird's nests, Semi-final product, self-life: 3 years in room temperature", 
-            price: 180,
-            category: "Dried bird nest",
-            image: "https://i.postimg.cc/sXwxR035/Bird_s_Nest_Num1_100g.png",
-            points: 0
-        },
-        { 
-            id: 15, 
-            name: "Bird Nest Princess 100g", 
-            description: "100% pure bird's nests, Semi-final product, self-life: 3 years in room temperature", 
-            price: 200,
-            category: "Dried bird nest",
-            image: "",
-            points: 0
-        }
-    ];
+        // ---------- MENU DATA (with categories) ----------
+        const menuItems = [
+            { id: 1, name: "Bird Nest 75ml (general)", description: "100% pure bird's nests, ready to drink, shelf-life: 30 days in fridge", price: 5, category: "bird nest drinks", image: "https://i.postimg.cc/rw3v9gyK/75ml.png" },
+            { id: 2, name: "Bird Nest 75ml (6 bottles)", description: "100% pure bird's nests, ready to drink, shelf-life: 30 days in fridge", price: 30, category: "bird nest drinks", image: "https://i.postimg.cc/Dw89sRhZ/75ml_6bottle.png" },
+            { id: 3, name: "Bird Nest 75ml (6 bottles original taste)", description: "100% pure bird's nests, original taste", price: 30, category: "bird nest drinks", image: "https://i.postimg.cc/vZcJ9Cyc/75ml_6bottle_original.png" },
+            { id: 4, name: "Bird Nest 75ml (diabetic)", description: "Suitable for diabetic, no added sugar", price: 5, category: "bird nest drinks", image: "https://i.postimg.cc/vZcJ9Cyc/75ml_6bottle_original.png" },
+            { id: 5, name: "Bird Nest 75ml (6 bottles diabetic)", description: "6 bottles diabetic-friendly", price: 30, category: "bird nest drinks", image: "https://i.postimg.cc/vZcJ9Cyc/75ml_6bottle_original.png" },
+            { id: 6, name: "Bird Nest 100ml", description: "100% pure, ready to drink", price: 10, category: "bird nest drinks", image: "https://i.postimg.cc/XYpRFtW7/100ml.png" },
+            { id: 7, name: "Bird Nest 150ml", description: "100% pure, ready to drink", price: 12, category: "bird nest drinks", image: "https://i.postimg.cc/htfkxNnQ/150ml.png" },
+            { id: 8, name: "Bird Nest 200ml", description: "100% pure, ready to drink", price: 15, category: "bird nest drinks", image: "https://i.postimg.cc/8s8mhCxR/200ml.png" },
+            { id: 9, name: "Bird Nest 250ml", description: "100% pure, ready to drink", price: 20, category: "bird nest drinks", image: "https://i.postimg.cc/PNGQmq0m/250ml.png" },
+            { id: 10, name: "Bird Nest 500ml", description: "100% pure, ready to drink", price: 50, category: "bird nest drinks", image: "https://i.postimg.cc/ZqZH0ChV/500ml.png" },
+            { id: 11, name: "Bird Nest 1000ml", description: "100% pure, ready to drink", price: 100, category: "bird nest drinks", image: "https://i.postimg.cc/Wb1Pq1sV/1000ml.png" },
+            { id: 12, name: "Bird Nest Grade A (100g)", description: "Dried, semi-final product, shelf-life: 3 years", price: 290, category: "Dried bird nest", image: "https://i.postimg.cc/Pq6bSyBf/Grade_A.png" },
+            { id: 13, name: "Bird Nest Konkat (100g)", description: "Dried, high quality", price: 250, category: "Dried bird nest", image: "https://i.postimg.cc/zXWNCP93/Konkat.png" },
+            { id: 14, name: "Bird Nest Num (100g)", description: "Dried, semi-final product", price: 180, category: "Dried bird nest", image: "https://i.postimg.cc/sXwxR035/Bird_s_Nest_Num1_100g.png" },
+            { id: 15, name: "Bird Nest Princess (100g)", description: "Premium dried bird nest", price: 200, category: "Dried bird nest", image: "" }
+        ];
 
-    // Get user data from Telegram WebApp
-    let user = {
-        id: 'guest',
-        firstName: 'Guest',
-        lastName: '',
-        username: '',
-        photoUrl: null
-    };
+        // ---------- USER DATA FROM TELEGRAM ----------
+        let user = {
+            id: 'guest',
+            firstName: 'Guest',
+            lastName: '',
+            username: '',
+            photoUrl: null
+        };
 
-    // Try to get real user data from Telegram
-    if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
-        user.id = tg.initDataUnsafe.user.id || 'guest';
-        user.firstName = tg.initDataUnsafe.user.first_name || 'Guest';
-        user.lastName = tg.initDataUnsafe.user.last_name || '';
-        user.username = tg.initDataUnsafe.user.username || '';
-        user.photoUrl = tg.initDataUnsafe.user.photo_url || null;
-    } else {
-        // Fallback: try to get from URL parameters (for testing)
-        const urlParams = new URLSearchParams(window.location.search);
-        if (urlParams.get('user_id')) {
-            user.id = urlParams.get('user_id');
-            user.firstName = urlParams.get('first_name') || 'User';
-        }
-    }
-
-    console.log('User data loaded:', user); // For debugging
-
-    // App state
-    let cart = [];
-    let loyaltyPoints = 0;
-    let orderHistory = [];
-
-    // Load saved data
-    function loadData() {
-        const savedCart = localStorage.getItem(`cart_${user.id}`);
-        const savedPoints = localStorage.getItem(`points_${user.id}`);
-        const savedOrders = localStorage.getItem(`orders_${user.id}`);
-        
-        if (savedCart) cart = JSON.parse(savedCart);
-        if (savedPoints) loyaltyPoints = parseInt(savedPoints);
-        if (savedOrders) orderHistory = JSON.parse(savedOrders);
-        
-        updateCartCount();
-        updateCartDisplay();
-    }
-
-    // Save data
-    function saveData() {
-        localStorage.setItem(`cart_${user.id}`, JSON.stringify(cart));
-        localStorage.setItem(`points_${user.id}`, loyaltyPoints);
-        localStorage.setItem(`orders_${user.id}`, JSON.stringify(orderHistory));
-    }
-
-    // Initialize
-    function init() {
-        console.log('Telegram WebApp user data:', tg.initDataUnsafe?.user);
-        document.getElementById('userInfo').textContent = `Welcome, ${user.firstName}!`;
-        
-        if (user.photoUrl) {
-            document.getElementById('profileAvatar').innerHTML = 
-                `<img src="${user.photoUrl}" style="width:100%; border-radius:50%;">`;
-        }
-        
-        updateProfileInfo();
-        renderMenu();
-        loadData();
-        simulateOrderHistory(); // For demo purposes
-    }
-
-    // Render menu grid
-    function renderMenu() {
-        const grid = document.getElementById('menuGrid');
-        const loader = document.getElementById('menuLoader');
-        
-        setTimeout(() => {
-            loader.classList.add('hidden');
-            grid.innerHTML = menuItems.map(item => {
-                // Check if item.image is a valid image URL
-                const isImageUrl = item.image && (item.image.startsWith('http') || item.image.startsWith('https') || item.image.match(/\.(jpg|jpeg|png|gif|webp)$/i));
-                
-                let imageHtml = '';
-                if (isImageUrl) {
-                    imageHtml = `<img src="${item.image}" alt="${item.name}" style="width:100%; height:100%; object-fit:cover;">`;
-                } else {
-                    // Fallback to emoji or text
-                    imageHtml = item.image || '🍽️';
-                }
-                
-                return `
-                    <div class="menu-item">
-                        <div class="item-image">${imageHtml}</div>
-                        <div class="item-details">
-                            <div class="item-header">
-                                <span class="item-name">${item.name}</span>
-                                <span class="item-price">$${item.price.toFixed(2)}</span>
-                            </div>
-                            <div class="item-description">${item.description}</div>
-                            <div class="item-controls">
-                                <div class="quantity-controls">
-                                    <button class="qty-btn" onclick="adjustQuantity(${item.id}, -1)">-</button>
-                                    <span class="qty-value" id="qty_${item.id}">0</span>
-                                    <button class="qty-btn" onclick="adjustQuantity(${item.id}, 1)">+</button>
-                                </div>
-                                <button class="add-btn" onclick="addToCart(${item.id})">
-                                    Add • <span id="itemPrice_${item.id}">$${item.price.toFixed(2)}</span>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        }, 500);
-    }
-
-    // Adjust quantity
-    function adjustQuantity(itemId, change) {
-        const qtyElement = document.getElementById(`qty_${itemId}`);
-        let qty = parseInt(qtyElement.textContent) + change;
-        qty = Math.max(0, Math.min(99, qty));
-        qtyElement.textContent = qty;
-        
-        // Update price display
-        const item = menuItems.find(i => i.id === itemId);
-        const priceElement = document.getElementById(`itemPrice_${itemId}`);
-        priceElement.textContent = `$${(item.price * (qty || 1)).toFixed(2)}`;
-    }
-
-    // Add to cart
-    function addToCart(itemId) {
-        const qty = parseInt(document.getElementById(`qty_${itemId}`).textContent) || 1;
-        const item = menuItems.find(i => i.id === itemId);
-        
-        for (let i = 0; i < qty; i++) {
-            cart.push({...item});
-        }
-        
-        // Reset quantity display
-        document.getElementById(`qty_${itemId}`).textContent = '0';
-        document.getElementById(`itemPrice_${itemId}`).textContent = `$${item.price.toFixed(2)}`;
-        
-        updateCartCount();
-        updateCartDisplay();
-        saveData();
-        
-        // Haptic feedback
-        tg.HapticFeedback.impactOccurred('light');
-        
-        // Show toast
-        showToast(`Added ${qty} × ${item.name} to cart!`);
-    }
-
-    // Update cart count
-    function updateCartCount() {
-        const count = cart.length;
-        const cartTab = document.getElementById('cartTabCount');
-        
-        if (count > 0) {
-            cartTab.textContent = `(${count})`;
-            cartTab.classList.remove('hidden');
+        if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
+            user.id = tg.initDataUnsafe.user.id || 'guest';
+            user.firstName = tg.initDataUnsafe.user.first_name || 'Guest';
+            user.lastName = tg.initDataUnsafe.user.last_name || '';
+            user.username = tg.initDataUnsafe.user.username || '';
+            user.photoUrl = tg.initDataUnsafe.user.photo_url || null;
         } else {
-            cartTab.classList.add('hidden');
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('user_id')) {
+                user.id = urlParams.get('user_id');
+                user.firstName = urlParams.get('first_name') || 'User';
+            }
         }
-    }
 
-    // Update cart display
-    function updateCartDisplay() {
-        const cartDiv = document.getElementById('cartItems');
-        const emptyCart = document.getElementById('emptyCart');
-        const cartSummary = document.getElementById('cartSummary');
-        
-        if (cart.length === 0) {
-            cartDiv.innerHTML = '';
-            emptyCart.classList.remove('hidden');
-            cartSummary.classList.add('hidden');
-            return;
+        // ---------- APP STATE ----------
+        let cart = [];            // each item is a full menu object (duplicates allowed)
+        let loyaltyPoints = 0;
+        let orderHistory = [];
+        let currentCategory = "all";
+
+        // ---------- HELPER FUNCTIONS ----------
+        function showToast(message, duration = 2000) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.remove('hidden');
+            setTimeout(() => toast.classList.add('hidden'), duration);
         }
-        
-        emptyCart.classList.add('hidden');
-        cartSummary.classList.remove('hidden');
-        
-        // Group cart items
-        const grouped = cart.reduce((acc, item) => {
-            acc[item.id] = acc[item.id] || { item, count: 0 };
-            acc[item.id].count++;
-            return acc;
-        }, {});
-        
-        cartDiv.innerHTML = Object.values(grouped).map(({item, count}) => `
-            <div class="cart-item">
-                <div class="cart-item-info">
-                    <h4>${item.name} ${count > 1 ? `× ${count}` : ''}</h4>
-                    <span class="cart-item-price">$${(item.price * count).toFixed(2)}</span>
-                </div>
-                <div class="cart-item-controls">
-                    <button class="remove-btn" onclick="removeFromCart(${item.id})">Remove</button>
-                </div>
-            </div>
-        `).join('');
-        
-        updateCartTotal();
-    }
 
-    // Remove from cart
-    function removeFromCart(itemId) {
-        const index = cart.findIndex(item => item.id === itemId);
-        if (index !== -1) {
-            cart.splice(index, 1);
+        function saveData() {
+            localStorage.setItem(`cart_${user.id}`, JSON.stringify(cart));
+            localStorage.setItem(`points_${user.id}`, loyaltyPoints);
+            localStorage.setItem(`orders_${user.id}`, JSON.stringify(orderHistory));
+        }
+
+        function loadData() {
+            const savedCart = localStorage.getItem(`cart_${user.id}`);
+            const savedPoints = localStorage.getItem(`points_${user.id}`);
+            const savedOrders = localStorage.getItem(`orders_${user.id}`);
+            if (savedCart) cart = JSON.parse(savedCart);
+            if (savedPoints) loyaltyPoints = parseInt(savedPoints);
+            if (savedOrders) orderHistory = JSON.parse(savedOrders);
+            updateCartCount();
+            updateCartDisplay();
+        }
+
+        // Update cart badge on tab
+        function updateCartCount() {
+            const count = cart.length;
+            const cartTabSpan = document.getElementById('cartTabCount');
+            if (count > 0) {
+                cartTabSpan.textContent = `(${count})`;
+                cartTabSpan.classList.remove('hidden');
+            } else {
+                cartTabSpan.classList.add('hidden');
+            }
+        }
+
+        // Update cart UI and summary
+        function updateCartDisplay() {
+            const cartDiv = document.getElementById('cartItems');
+            const emptyCart = document.getElementById('emptyCart');
+            const cartSummary = document.getElementById('cartSummary');
+            
+            if (cart.length === 0) {
+                cartDiv.innerHTML = '';
+                emptyCart.classList.remove('hidden');
+                cartSummary.classList.add('hidden');
+                return;
+            }
+            
+            emptyCart.classList.add('hidden');
+            cartSummary.classList.remove('hidden');
+            
+            // Group identical items for display
+            const grouped = cart.reduce((acc, item) => {
+                const key = item.id;
+                if (!acc[key]) acc[key] = { item, count: 0 };
+                acc[key].count++;
+                return acc;
+            }, {});
+            
+            cartDiv.innerHTML = Object.values(grouped).map(({item, count}) => `
+                <div class="cart-item">
+                    <div class="cart-item-info">
+                        <h4>${item.name}</h4>
+                        <span class="cart-item-price">$${(item.price * count).toFixed(2)}</span>
+                        <div style="font-size:0.8rem; color:gray;">Quantity: ${count}</div>
+                    </div>
+                    <div class="cart-item-controls">
+                        <button class="remove-btn" onclick="removeAllFromCart(${item.id})">Remove all</button>
+                    </div>
+                </div>
+            `).join('');
+            
+            const total = cart.reduce((sum, item) => sum + item.price, 0);
+            document.getElementById('cartTotal').textContent = `$${total.toFixed(2)}`;
+        }
+
+        // Remove all copies of a product from cart
+        function removeAllFromCart(itemId) {
+            cart = cart.filter(item => item.id !== itemId);
             updateCartCount();
             updateCartDisplay();
             saveData();
-            tg.HapticFeedback.notificationOccurred('success');
+            tg.HapticFeedback.notificationOccurred('warning');
+            showToast("Item removed from cart");
         }
-    }
 
-    // Update cart total
-    function updateCartTotal() {
-        const total = cart.reduce((sum, item) => sum + item.price, 0);
-        document.getElementById('cartTotal').textContent = `$${total.toFixed(2)}`;
-    }
-
-    // Update profile info
-    function updateProfileInfo() {
-        document.getElementById('profileInfo').innerHTML = `
-            <p><strong>${user.firstName} ${user.lastName}</strong></p>
-            <p>@${user.username || 'no username'}</p>
-            <p>Member since: ${new Date().toLocaleDateString()}</p>
-        `;
-        
-        document.getElementById('pointsDisplay').querySelector('.points-value').textContent = loyaltyPoints;
-    }
-
-    // Simulate order history for demo
-    function simulateOrderHistory() {
-        if (orderHistory.length === 0) {
-            orderHistory = [
-                {
-                    id: 'ORD001',
-                    date: new Date(Date.now() - 86400000).toLocaleDateString(),
-                    items: ['Classic Durger', 'Fries', 'Milkshake'],
-                    total: 15.97,
-                    status: 'Delivered',
-                    points: 20
-                },
-                {
-                    id: 'ORD002',
-                    date: new Date(Date.now() - 172800000).toLocaleDateString(),
-                    items: ['Double Durger', 'Onion Rings'],
-                    total: 13.98,
-                    status: 'Delivered',
-                    points: 18
-                }
-            ];
-        }
-        
-        const historyDiv = document.getElementById('orderHistory');
-        historyDiv.innerHTML = orderHistory.map(order => `
-            <div class="order-card">
-                <div class="order-header">
-                    <span><strong>${order.id}</strong></span>
-                    <span class="status">✓ ${order.status}</span>
-                </div>
-                <div class="order-items">${order.items.join(' • ')}</div>
-                <div class="order-total">Total: $${order.total.toFixed(2)}</div>
-                <small>Earned ${order.points} points</small>
-            </div>
-        `).join('');
-    }
-
-    // Checkout function
-    function checkout() {
-        if (cart.length === 0) {
-            showToast('Your cart is empty!');
-            return;
-        }
-        
-        const total = cart.reduce((sum, item) => sum + item.price, 0);
-        const pointsEarned = cart.reduce((sum, item) => sum + (item.points || 0), 0);
-        
-        // Create order
-        const order = {
-            id: 'ORD' + Math.floor(Math.random() * 1000),
-            date: new Date().toLocaleDateString(),
-            items: cart.map(item => item.name),
-            total: total,
-            status: 'Confirmed',
-            points: pointsEarned
-        };
-        
-        // Add to history and update points
-        orderHistory.unshift(order);
-        loyaltyPoints += pointsEarned;
-        
-        // Prepare order data for bot
-        const orderData = {
-            userId: user.id,
-            userName: `${user.firstName} ${user.lastName}`.trim(),
-            username: user.username || 'no_username',
-            firstName: user.firstName,
-            lastName: user.lastName,
-            items: cart.map(item => ({
-                name: item.name,
-                price: item.price
-            })),
-            total: total.toFixed(2),
-            points: pointsEarned,
-            totalPoints: loyaltyPoints,
-            timestamp: new Date().toISOString()
-        };
-        
-        // Clear cart
-        cart = [];
-        updateCartCount();
-        updateCartDisplay();
-        updateProfileInfo();
-        saveData();
-        
-        // Send data to bot
-        tg.sendData(JSON.stringify(orderData));
-        
-        // Show success message
-        showToast(`Order placed! Earned ${pointsEarned} points!`, 3000);
-        
-        // Haptic feedback
-        tg.HapticFeedback.notificationOccurred('success');
-    }
-
-    // Switch tabs
-    function switchTab(tabName) {
-        // Update tab buttons
-        document.querySelectorAll('.tab').forEach(tab => {
-            tab.classList.remove('active');
-        });
-        event.target.classList.add('active');
-        
-        // Update sections
-        document.querySelectorAll('.section').forEach(section => {
-            section.classList.remove('active');
-        });
-        document.getElementById(`${tabName}Section`).classList.add('active');
-        
-        // Refresh displays
-        if (tabName === 'cart') {
+        // Add to cart using the quantity from the item's control
+        function addToCart(itemId) {
+            const qtySpan = document.getElementById(`qty_${itemId}`);
+            let qty = parseInt(qtySpan.textContent);
+            if (isNaN(qty) || qty < 1) qty = 1;
+            
+            const item = menuItems.find(i => i.id === itemId);
+            for (let i = 0; i < qty; i++) {
+                cart.push({ ...item });
+            }
+            
+            // Reset quantity display for that item
+            qtySpan.textContent = '0';
+            updateCartCount();
             updateCartDisplay();
-        } else if (tabName === 'profile') {
-            updateProfileInfo();
-            simulateOrderHistory();
+            saveData();
+            tg.HapticFeedback.impactOccurred('light');
+            showToast(`Added ${qty} × ${item.name}`);
         }
-    }
 
-    // Show toast notification
-    function showToast(message, duration = 2000) {
-        const toast = document.getElementById('toast');
-        toast.textContent = message;
-        toast.classList.remove('hidden');
+        function adjustQuantity(itemId, delta) {
+            const qtySpan = document.getElementById(`qty_${itemId}`);
+            let current = parseInt(qtySpan.textContent);
+            let newVal = current + delta;
+            if (newVal < 0) newVal = 0;
+            if (newVal > 99) newVal = 99;
+            qtySpan.textContent = newVal;
+        }
+
+        // Render menu with category filter
+        function renderMenu() {
+            const grid = document.getElementById('menuGrid');
+            const loader = document.getElementById('menuLoader');
+            loader.classList.remove('hidden');
+            
+            setTimeout(() => {
+                loader.classList.add('hidden');
+                const filtered = currentCategory === "all" 
+                    ? menuItems 
+                    : menuItems.filter(item => item.category === currentCategory);
+                
+                if (filtered.length === 0) {
+                    grid.innerHTML = '<div style="text-align:center; padding:40px;">No items in this category</div>';
+                    return;
+                }
+                
+                grid.innerHTML = filtered.map(item => {
+                    let imageHtml = '';
+                    if (item.image && item.image.trim() !== '' && (item.image.startsWith('http') || item.image.startsWith('data:'))) {
+                        imageHtml = `<img src="${item.image}" alt="${item.name}" onerror="this.onerror=null; this.parentElement.innerHTML='🍽️';">`;
+                    } else {
+                        imageHtml = '🍽️';
+                    }
+                    return `
+                        <div class="menu-item">
+                            <div class="item-image">${imageHtml}</div>
+                            <div class="item-details">
+                                <div class="item-header">
+                                    <span class="item-name">${escapeHtml(item.name)}</span>
+                                    <span class="item-price">$${item.price.toFixed(2)}</span>
+                                </div>
+                                <div class="item-description">${escapeHtml(item.description)}</div>
+                                <div class="item-controls">
+                                    <div class="quantity-controls">
+                                        <button class="qty-btn" onclick="adjustQuantity(${item.id}, -1)">-</button>
+                                        <span class="qty-value" id="qty_${item.id}">0</span>
+                                        <button class="qty-btn" onclick="adjustQuantity(${item.id}, 1)">+</button>
+                                    </div>
+                                    <button class="add-btn" onclick="addToCart(${item.id})">
+                                        Add • $${item.price.toFixed(2)}
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }, 200);
+        }
+
+        function escapeHtml(str) {
+            return str.replace(/[&<>]/g, function(m) {
+                if (m === '&') return '&amp;';
+                if (m === '<') return '&lt;';
+                if (m === '>') return '&gt;';
+                return m;
+            });
+        }
+
+        // Checkout: calculate points, create order, clear cart
+        function checkout() {
+            if (cart.length === 0) {
+                showToast('Cart is empty!');
+                return;
+            }
+            
+            const total = cart.reduce((sum, item) => sum + item.price, 0);
+            const pointsEarned = Math.floor(total); // 1 point per dollar
+            
+            const order = {
+                id: 'ORD' + Date.now() + Math.floor(Math.random() * 1000),
+                date: new Date().toLocaleString(),
+                items: cart.map(item => item.name),
+                total: total,
+                status: 'Confirmed',
+                pointsEarned: pointsEarned
+            };
+            
+            orderHistory.unshift(order);
+            loyaltyPoints += pointsEarned;
+            
+            // Prepare data to send to bot
+            const orderData = {
+                userId: user.id,
+                userName: `${user.firstName} ${user.lastName}`.trim(),
+                username: user.username || '',
+                items: cart.map(item => ({ name: item.name, price: item.price })),
+                total: total.toFixed(2),
+                pointsEarned: pointsEarned,
+                totalPoints: loyaltyPoints,
+                timestamp: new Date().toISOString()
+            };
+            
+            // Clear cart
+            cart = [];
+            updateCartCount();
+            updateCartDisplay();
+            updateProfileInfo();
+            saveData();
+            
+            // Send to bot
+            tg.sendData(JSON.stringify(orderData));
+            
+            showToast(`✅ Order placed! Earned ${pointsEarned} points.`, 3000);
+            tg.HapticFeedback.notificationOccurred('success');
+            
+            // Switch to profile to show updated points & order
+            switchTab('profile');
+        }
         
-        setTimeout(() => {
-            toast.classList.add('hidden');
-        }, duration);
-    }
-
-    // Start the app
-    init();
-</script>
+        function updateProfileInfo() {
+            document.getElementById('profileInfo').innerHTML = `
+                <p><strong>${escapeHtml(user.firstName)} ${escapeHtml(user.lastName)}</strong></p>
+                <p>@${escapeHtml(user.username || 'no username')}</p>
+                <p>Member since: ${new Date().toLocaleDateString()}</p>
+            `;
+            document.querySelector('#pointsDisplay .points-value').textContent = loyaltyPoints;
+            
+            const historyDiv = document.getElementById('orderHistory');
+            if (orderHistory.length === 0) {
+                historyDiv.innerHTML = '<p style="text-align:center; padding:20px;">No orders yet. Start shopping!</p>';
+            } else {
+                historyDiv.innerHTML = orderHistory.map(order => `
+                    <div class="order-card">
+                        <div class="order-header">
+                            <span><strong>${order.id}</strong></span>
+                            <span class="status">✓ ${order.status}</span>
+                        </div>
+                        <div class="order-items">${order.items.slice(0, 3).join(' • ')}${order.items.length > 3 ? ' ...' : ''}</div>
+                        <div class="order-total">Total: $${order.total.toFixed(2)}</div>
+                        <small>Earned ${order.pointsEarned} points</small>
+                        <div><small>${order.date}</small></div>
+                    </div>
+                `).join('');
+            }
+        }
+        
+        // Tab switching (works both from click and programmatically)
+        function switchTab(tabName) {
+            // Update active class on main tabs
+            document.querySelectorAll('.tab').forEach(tab => {
+                if (tab.getAttribute('data-tab') === tabName) {
+                    tab.classList.add('active');
+                } else {
+                    tab.classList.remove('active');
+                }
+            });
+            
+            // Show/hide sections
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.remove('active');
+            });
+            document.getElementById(`${tabName}Section`).classList.add('active');
+            
+            if (tabName === 'cart') {
+                updateCartDisplay();
+            } else if (tabName === 'profile') {
+                updateProfileInfo();
+            }
+        }
+        
+        // Category filter handling
+        function initCategoryFilters() {
+            const filterBtns = document.querySelectorAll('.filter-btn');
+            filterBtns.forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    filterBtns.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    currentCategory = btn.getAttribute('data-cat');
+                    renderMenu();
+                });
+            });
+        }
+        
+        // Initialize Telegram UI and load data
+        function init() {
+            document.getElementById('userInfo').textContent = `Welcome, ${user.firstName}!`;
+            if (user.photoUrl) {
+                const avatarDiv = document.getElementById('profileAvatar');
+                avatarDiv.innerHTML = `<img src="${user.photoUrl}" alt="avatar">`;
+            }
+            
+            loadData();
+            renderMenu();
+            updateProfileInfo();
+            initCategoryFilters();
+            
+            // Attach tab click handlers
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const tabName = tab.getAttribute('data-tab');
+                    switchTab(tabName);
+                });
+            });
+            
+            // If no orders, show demo message but don't override real orders
+            if (orderHistory.length === 0) {
+                // optional: add a demo order? Not necessary, just show empty message.
+            }
+        }
+        
+        init();
+    </script>
 </body>
 </html>
