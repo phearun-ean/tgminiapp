@@ -1,10 +1,15 @@
 import logging
 import json
+import os
 from telegram import Update, KeyboardButton, ReplyKeyboardMarkup, WebAppInfo
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes
+import os
+from dotenv import load_dotenv
+load_dotenv()
+BOT_TOKEN = os.getenv("BOT_TOKEN")
 
 # ========== CONFIGURATION ==========
-BOT_TOKEN = "8452975233:AAG-JdJ_0XBspAVj7xKRzbTSdtT0sWz4B-k"        # Your bot token from Step 1
+      # Your bot token from Step 1
 SELLER_CHAT_ID = "455774531"   # Your Chat ID from Step 3
 YOUR_WEB_APP_URL = "https://phearun-ean.github.io/tgminiapp/"  # URL of your deployed Mini App
 # ===================================
