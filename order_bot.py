@@ -3,17 +3,13 @@ import json
 import os
 from telegram import Update, KeyboardButton, ReplyKeyboardMarkup, WebAppInfo
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes
-import os
 from dotenv import load_dotenv
-load_dotenv()
-BOT_TOKEN = os.getenv("BOT_TOKEN")
 from telegram.helpers import escape_markdown
 
-# ========== CONFIGURATION ==========
-      # Your bot token from Step 1
-SELLER_CHAT_ID = "455774531"   # Your Chat ID from Step 3
-YOUR_WEB_APP_URL = "https://phearun-ean.github.io/tgminiapp/"  # URL of your deployed Mini App
-# ===================================
+load_dotenv()
+BOT_TOKEN = os.getenv("BOT_TOKEN")
+SELLER_CHAT_ID = "455774531"   # Must be your numeric chat ID (get from @userinfobot)
+YOUR_WEB_APP_URL = "https://phearun-ean.github.io/tgminiapp/"
 
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -21,13 +17,10 @@ logging.basicConfig(
 )
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Send a message with a button that opens the Mini App."""
-    # Create the button that will open your Mini App
     button = KeyboardButton(
         text="🍽️ Open Bird Nest House",
         web_app=WebAppInfo(url=YOUR_WEB_APP_URL)
     )
-    # Put the button on the regular keyboard (not inline)
     reply_markup = ReplyKeyboardMarkup(
         keyboard=[[button]],
         resize_keyboard=True,
@@ -41,7 +34,6 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def handle_order(update: Update, context: ContextTypes.DEFAULT_TYPE):
     message = update.effective_message
     
-    # Log everything to see what arrives
     logging.info(f"Received update: {update}")
     
     if message and message.web_app_data:
@@ -52,7 +44,7 @@ async def handle_order(update: Update, context: ContextTypes.DEFAULT_TYPE):
             order_data = json.loads(raw_data)
             logging.info(f"Parsed order_data: {order_data}")
             
-            # Extract user info with fallbacks
+            # Extract all user fields (same as sent from mini app)
             user_id = order_data.get('userId', 'Unknown')
             user_name = order_data.get('userName', 'Guest')
             username = order_data.get('username', '')
@@ -63,27 +55,24 @@ async def handle_order(update: Update, context: ContextTypes.DEFAULT_TYPE):
             total = order_data.get('total', '0.00')
             points = order_data.get('points', 0)
             
-            # Validate items structure
             if not isinstance(items, list):
                 raise ValueError(f"Items is not a list: {type(items)}")
             
-            # Build detailed customer info
-            customer_info = f"👤 *Customer:* {user_name}\n"
+            # Build customer info with proper escaping (MarkdownV2)
+            customer_info = f"👤 *Customer:* {escape_markdown(user_name, version=2)}\n"
             if username:
-                customer_info += f"🆔 *Username:* @{username}\n"
-            customer_info += f"🔢 *User ID:* `{user_id}`\n"
+                customer_info += f"🆔 *Username:* @{escape_markdown(username, version=2)}\n"
+            customer_info += f"🔢 *User ID:* `{escape_markdown(str(user_id), version=2)}`\n"
             if first_name:
-                customer_info += f"📛 *First Name:* {first_name}\n"
+                customer_info += f"📛 *First Name:* {escape_markdown(first_name, version=2)}\n"
             if last_name:
-                customer_info += f"📛 *Last Name:* {last_name}\n"
+                customer_info += f"📛 *Last Name:* {escape_markdown(last_name, version=2)}\n"
             
-            # Build order items
             items_text = ""
             for item in items:
-                # Ensure each item has name and price
                 item_name = item.get('name', 'Unknown item')
                 item_price = item.get('price', 0)
-                items_text += f"  • {item_name} - ${item_price}\n"
+                items_text += f"  • {escape_markdown(item_name, version=2)} - ${item_price}\n"
             
             order_text = f"🆕 *NEW ORDER!*\n\n"
             order_text += customer_info
@@ -96,17 +85,18 @@ async def handle_order(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await context.bot.send_message(
                 chat_id=SELLER_CHAT_ID,
                 text=order_text,
-                parse_mode="Markdown"
+                parse_mode="MarkdownV2"
             )
             
-            # Send confirmation back to customer
+            # Confirm to customer
+            customer_name_escaped = escape_markdown(user_name, version=2)
             await update.message.reply_text(
-                f"✅ *Order Confirmed, {user_name}!*\n\n"
+                f"✅ *Order Confirmed, {customer_name_escaped}!*\n\n"
                 f"Thank you for your order!\n"
                 f"Total: ${total}\n"
                 f"You earned {points} loyalty points 🎉\n\n"
                 f"We'll notify you when your order is ready.",
-                parse_mode="Markdown"
+                parse_mode="MarkdownV2"
             )
             
             logging.info(f"Order from {user_name} (ID: {user_id}): ${total}")
@@ -122,12 +112,8 @@ async def handle_order(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 def main():
     app = Application.builder().token(BOT_TOKEN).build()
-    
-    # Command handler for /start
     app.add_handler(CommandHandler("start", start))
-    # Handler for web_app_data (orders)
     app.add_handler(MessageHandler(filters.StatusUpdate.WEB_APP_DATA, handle_order))
-    # Optional: handle plain text messages
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_order))
     
     print("🤖 Bot is running... Waiting for orders...")
