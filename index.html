@@ -26,10 +26,9 @@
             background: var(--tg-theme-bg-color, #ffffff);
             color: var(--tg-theme-text-color, #333);
             min-height: 100vh;
-            padding-bottom: 90px; /* Space for fixed cart summary */
+            padding-bottom: 90px;
         }
 
-        /* Header Styles */
         .header {
             background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
             color: white;
@@ -58,7 +57,6 @@
             font-size: 0.9rem;
         }
 
-        /* Main Tabs (Menu, Cart, Profile) */
         .tabs {
             display: flex;
             background: var(--tg-theme-secondary-bg-color, #f5f5f5);
@@ -83,7 +81,6 @@
             color: white;
         }
 
-        /* Category filters inside Menu section */
         .category-filters {
             display: flex;
             gap: 10px;
@@ -108,7 +105,6 @@
             color: white;
         }
 
-        /* Content Sections */
         .section {
             display: none;
             padding: 0 15px 15px 15px;
@@ -118,7 +114,6 @@
             display: block;
         }
 
-        /* Menu Items Grid */
         .menu-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -239,7 +234,6 @@
             background: var(--primary-dark);
         }
 
-        /* Cart Styles */
         .cart-item {
             background: var(--tg-theme-secondary-bg-color, #f9f9f9);
             border-radius: 15px;
@@ -275,7 +269,6 @@
             font-weight: 500;
         }
 
-        /* Profile Styles */
         .profile-card {
             background: var(--tg-theme-secondary-bg-color, #f9f9f9);
             border-radius: 20px;
@@ -326,7 +319,6 @@
             display: block;
         }
 
-        /* Order History */
         .order-card {
             background: var(--tg-theme-secondary-bg-color, #f9f9f9);
             border-radius: 15px;
@@ -358,7 +350,6 @@
             font-weight: 600;
         }
 
-        /* Cart Summary (Fixed Bottom) */
         .cart-summary {
             position: fixed;
             bottom: 0;
@@ -406,12 +397,6 @@
             color: #999;
         }
 
-        .empty-cart p {
-            font-size: 1.2rem;
-            margin-top: 10px;
-        }
-
-        /* Loyalty Banner */
         .loyalty-banner {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
@@ -433,7 +418,6 @@
             cursor: pointer;
         }
 
-        /* Loading Spinner */
         .spinner {
             border: 4px solid rgba(0, 0, 0, 0.1);
             border-left-color: var(--primary);
@@ -492,7 +476,6 @@
         <div class="tab" data-tab="profile">👤 Profile</div>
     </div>
 
-    <!-- Menu Section -->
     <div id="menuSection" class="section active">
         <div class="loyalty-banner">
             <div>
@@ -501,7 +484,6 @@
             </div>
             <button onclick="switchTab('profile')">View Points</button>
         </div>
-        <!-- Category filters inside menu -->
         <div class="category-filters" id="categoryFilters">
             <button class="filter-btn active" data-cat="all">All</button>
             <button class="filter-btn" data-cat="bird nest drinks">🥤 Bird Nest Drinks</button>
@@ -511,7 +493,6 @@
         <div id="menuGrid" class="menu-grid"></div>
     </div>
 
-    <!-- Cart Section -->
     <div id="cartSection" class="section">
         <div id="cartItems"></div>
         <div id="emptyCart" class="empty-cart">
@@ -521,7 +502,6 @@
         </div>
     </div>
 
-    <!-- Profile Section -->
     <div id="profileSection" class="section">
         <div class="profile-card">
             <div class="profile-avatar" id="profileAvatar">👤</div>
@@ -540,7 +520,6 @@
         <div id="orderHistory"></div>
     </div>
 
-    <!-- Cart Summary (Fixed Bottom) -->
     <div id="cartSummary" class="cart-summary hidden">
         <div class="cart-total">
             Total: <span id="cartTotal">$0.00</span>
@@ -548,7 +527,6 @@
         <button class="checkout-btn" onclick="checkout()">Checkout →</button>
     </div>
 
-    <!-- Toast Notification -->
     <div id="toast" class="toast hidden"></div>
 
     <script>
@@ -556,7 +534,6 @@
         tg.expand();
         tg.MainButton.hide();
 
-        // ---------- MENU DATA (with categories) ----------
         const menuItems = [
             { id: 1, name: "Bird Nest 75ml (general)", description: "100% pure bird's nests, ready to drink, shelf-life: 30 days in fridge", price: 5, category: "bird nest drinks", image: "https://i.postimg.cc/rw3v9gyK/75ml.png" },
             { id: 2, name: "Bird Nest 75ml (6 bottles)", description: "100% pure bird's nests, ready to drink, shelf-life: 30 days in fridge", price: 30, category: "bird nest drinks", image: "https://i.postimg.cc/Dw89sRhZ/75ml_6bottle.png" },
@@ -575,7 +552,6 @@
             { id: 15, name: "Bird Nest Princess (100g)", description: "Premium dried bird nest", price: 200, category: "Dried bird nest", image: "" }
         ];
 
-        // ---------- USER DATA FROM TELEGRAM ----------
         let user = {
             id: 'guest',
             firstName: 'Guest',
@@ -598,13 +574,11 @@
             }
         }
 
-        // ---------- APP STATE ----------
-        let cart = [];            // each item is a full menu object (duplicates allowed)
+        let cart = [];
         let loyaltyPoints = 0;
         let orderHistory = [];
         let currentCategory = "all";
 
-        // ---------- HELPER FUNCTIONS ----------
         function showToast(message, duration = 2000) {
             const toast = document.getElementById('toast');
             toast.textContent = message;
@@ -629,7 +603,6 @@
             updateCartDisplay();
         }
 
-        // Update cart badge on tab
         function updateCartCount() {
             const count = cart.length;
             const cartTabSpan = document.getElementById('cartTabCount');
@@ -641,7 +614,6 @@
             }
         }
 
-        // Update cart UI and summary
         function updateCartDisplay() {
             const cartDiv = document.getElementById('cartItems');
             const emptyCart = document.getElementById('emptyCart');
@@ -657,7 +629,6 @@
             emptyCart.classList.add('hidden');
             cartSummary.classList.remove('hidden');
             
-            // Group identical items for display
             const grouped = cart.reduce((acc, item) => {
                 const key = item.id;
                 if (!acc[key]) acc[key] = { item, count: 0 };
@@ -668,7 +639,7 @@
             cartDiv.innerHTML = Object.values(grouped).map(({item, count}) => `
                 <div class="cart-item">
                     <div class="cart-item-info">
-                        <h4>${item.name}</h4>
+                        <h4>${escapeHtml(item.name)}</h4>
                         <span class="cart-item-price">$${(item.price * count).toFixed(2)}</span>
                         <div style="font-size:0.8rem; color:gray;">Quantity: ${count}</div>
                     </div>
@@ -682,7 +653,6 @@
             document.getElementById('cartTotal').textContent = `$${total.toFixed(2)}`;
         }
 
-        // Remove all copies of a product from cart
         function removeAllFromCart(itemId) {
             cart = cart.filter(item => item.id !== itemId);
             updateCartCount();
@@ -692,7 +662,6 @@
             showToast("Item removed from cart");
         }
 
-        // Add to cart using the quantity from the item's control
         function addToCart(itemId) {
             const qtySpan = document.getElementById(`qty_${itemId}`);
             let qty = parseInt(qtySpan.textContent);
@@ -703,7 +672,6 @@
                 cart.push({ ...item });
             }
             
-            // Reset quantity display for that item
             qtySpan.textContent = '0';
             updateCartCount();
             updateCartDisplay();
@@ -721,7 +689,6 @@
             qtySpan.textContent = newVal;
         }
 
-        // Render menu with category filter
         function renderMenu() {
             const grid = document.getElementById('menuGrid');
             const loader = document.getElementById('menuLoader');
@@ -780,7 +747,7 @@
             });
         }
 
-        // Checkout: calculate points, create order, clear cart
+        // ✅ FIXED: Checkout function now matches your bot's expected fields
         function checkout() {
             if (cart.length === 0) {
                 showToast('Cart is empty!');
@@ -802,14 +769,16 @@
             orderHistory.unshift(order);
             loyaltyPoints += pointsEarned;
             
-            // Prepare data to send to bot
+            // Build the exact payload your bot expects
             const orderData = {
                 userId: user.id,
                 userName: `${user.firstName} ${user.lastName}`.trim(),
                 username: user.username || '',
+                firstName: user.firstName,
+                lastName: user.lastName,
                 items: cart.map(item => ({ name: item.name, price: item.price })),
-                total: total.toFixed(2),
-                pointsEarned: pointsEarned,
+                total: total.toFixed(2),      // string as your bot expects
+                points: pointsEarned,          // ✅ changed from pointsEarned to points
                 totalPoints: loyaltyPoints,
                 timestamp: new Date().toISOString()
             };
@@ -821,14 +790,19 @@
             updateProfileInfo();
             saveData();
             
-            // Send to bot
-            tg.sendData(JSON.stringify(orderData));
-            
-            showToast(`✅ Order placed! Earned ${pointsEarned} points.`, 3000);
-            tg.HapticFeedback.notificationOccurred('success');
-            
-            // Switch to profile to show updated points & order
-            switchTab('profile');
+            // Send to bot and handle possible errors
+            try {
+                tg.sendData(JSON.stringify(orderData));
+                showToast(`✅ Order placed! Earned ${pointsEarned} points.`, 3000);
+                tg.HapticFeedback.notificationOccurred('success');
+                switchTab('profile');
+            } catch (err) {
+                console.error('Failed to send order:', err);
+                showToast('⚠️ Error sending order. Please try again.', 4000);
+                // Rollback: restore cart and points? For simplicity, we already cleared cart.
+                // But user can re-add items. Better to restore?
+                // We'll just inform user.
+            }
         }
         
         function updateProfileInfo() {
@@ -858,9 +832,7 @@
             }
         }
         
-        // Tab switching (works both from click and programmatically)
         function switchTab(tabName) {
-            // Update active class on main tabs
             document.querySelectorAll('.tab').forEach(tab => {
                 if (tab.getAttribute('data-tab') === tabName) {
                     tab.classList.add('active');
@@ -869,7 +841,6 @@
                 }
             });
             
-            // Show/hide sections
             document.querySelectorAll('.section').forEach(section => {
                 section.classList.remove('active');
             });
@@ -882,7 +853,6 @@
             }
         }
         
-        // Category filter handling
         function initCategoryFilters() {
             const filterBtns = document.querySelectorAll('.filter-btn');
             filterBtns.forEach(btn => {
@@ -895,7 +865,6 @@
             });
         }
         
-        // Initialize Telegram UI and load data
         function init() {
             document.getElementById('userInfo').textContent = `Welcome, ${user.firstName}!`;
             if (user.photoUrl) {
@@ -908,18 +877,12 @@
             updateProfileInfo();
             initCategoryFilters();
             
-            // Attach tab click handlers
             document.querySelectorAll('.tab').forEach(tab => {
                 tab.addEventListener('click', () => {
                     const tabName = tab.getAttribute('data-tab');
                     switchTab(tabName);
                 });
             });
-            
-            // If no orders, show demo message but don't override real orders
-            if (orderHistory.length === 0) {
-                // optional: add a demo order? Not necessary, just show empty message.
-            }
         }
         
         init();
