@@ -621,7 +621,7 @@
                 total: total,
                 pointsEarned: pointsEarned,
                 status: 'Confirmed',
-                timestamp: new Date().toISOString()
+                timestamp: new Date().toLocaleString("en-CA", { timeZone: "Asia/Phnom_Penh", hour12: false })
             };
             
             // Update local state
