@@ -291,6 +291,108 @@
 
     <div id="toast" class="toast hidden"></div>
 
+    <!-- ==================== MAIN APP SCRIPT (with Firebase integration) ==================== -->
+    <!-- NEW START: Firebase SDK and Firestore setup -->
+    <script type="module">
+        // Import Firebase modules
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
+        import { getFirestore, doc, setDoc, getDoc, updateDoc, arrayUnion, increment, onSnapshot } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+        
+        // Your Firebase configuration (REPLACE WITH YOUR OWN FROM FIREBASE CONSOLE)
+        const firebaseConfig = {
+            apiKey: "AIzaSyDUox5I6RG7sFABAyX_tUXi4rhiX80MDTY",
+            authDomain: "birdnesttgminiapp.firebaseapp.com",
+            projectId: "birdnesttgminiapp",
+            storageBucket: "birdnesttgminiapp.firebasestorage.app",
+            messagingSenderId: "1000241241106",
+            appId: "1:1000241241106:web:d23c6df3a1723aba100ccb",
+            measurementId: "G-M7FE78B3EM"
+        };
+        
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        
+        // Make db available globally (so other functions can use it)
+        window.db = db;
+        
+        // Function to save an order to Firestore
+        window.saveOrderToFirestore = async function(orderData) {
+            try {
+                const orderRef = doc(db, "orders", orderData.orderId);
+                await setDoc(orderRef, orderData);
+                console.log("✅ Order saved to Firestore");
+                return true;
+            } catch (error) {
+                console.error("❌ Firestore save error:", error);
+                return false;
+            }
+        };
+        
+        // Function to update user points in Firestore
+        window.updateUserPointsInFirestore = async function(userId, newPoints) {
+            try {
+                const userRef = doc(db, "users", userId);
+                await setDoc(userRef, { points: newPoints, lastUpdated: new Date().toISOString() }, { merge: true });
+                console.log(`✅ Points updated for ${userId}: ${newPoints}`);
+                return true;
+            } catch (error) {
+                console.error("❌ Failed to update points:", error);
+                return false;
+            }
+        };
+        
+        // Function to load user points from Firestore
+        window.loadUserPointsFromFirestore = async function(userId) {
+            try {
+                const userRef = doc(db, "users", userId);
+                const docSnap = await getDoc(userRef);
+                if (docSnap.exists()) {
+                    return docSnap.data().points || 0;
+                } else {
+                    return 0;
+                }
+            } catch (error) {
+                console.error("❌ Failed to load points:", error);
+                return 0;
+            }
+        };
+        
+        // Function to load order history from Firestore
+        window.loadOrdersFromFirestore = async function(userId) {
+            try {
+                // We'll use a simple query: orders where userId matches
+                // For simplicity, we'll store orders in a subcollection or filter manually
+                // Here we assume order documents have a field "userId"
+                // Since Firestore doesn't support "get all documents where userId = x" without an index,
+                // we'll use a different approach: store orders in a subcollection of the user document.
+                // But to keep it simple for now, we'll just return an empty array and rely on local storage.
+                // For production, you'd set up an index or use subcollections.
+                console.log("Order history loading from Firestore - implement based on your structure");
+                return [];
+            } catch (error) {
+                console.error("Error loading orders:", error);
+                return [];
+            }
+        };
+        
+        // Real-time listener for user points
+        window.listenToUserPoints = function(userId, callback) {
+            const userRef = doc(db, "users", userId);
+            return onSnapshot(userRef, (docSnap) => {
+                if (docSnap.exists()) {
+                    const points = docSnap.data().points || 0;
+                    callback(points);
+                } else {
+                    callback(0);
+                }
+            });
+        };
+        
+        console.log("Firebase initialized and ready");
+    </script>
+    <!-- NEW END -->
+
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand();
@@ -503,21 +605,51 @@
             }, 200);
         }
 
-        function checkout() {
+
+        // NEW START: Modified checkout with Firebase save
+        async function checkout() {
             if (cart.length === 0) { showToast('Cart empty'); return; }
             let total = cart.reduce((s, i) => s + i.price, 0);
             let pointsEarned = Math.floor(total);
+            let orderId = 'ORD_' + user.id + '_' + Date.now();
             let order = {
-                id: 'ORD' + Date.now(),
+                orderId: orderId,
+                userId: user.id,
+                userName: user.firstName + (user.lastName ? ' ' + user.lastName : ''),
+                username: user.username || '',
+                items: cart.map(i => ({ name: i.name, price: i.price })),
+                total: total,
+                pointsEarned: pointsEarned,
+                status: 'Confirmed',
+                timestamp: new Date().toISOString()
+            };
+            
+            // Update local state
+            orderHistory.unshift({
+                id: orderId,
                 date: new Date().toLocaleString(),
                 items: cart.map(i => i.name),
                 total: total,
                 status: 'Confirmed',
                 pointsEarned: pointsEarned
-            };
-            orderHistory.unshift(order);
+            });
             loyaltyPoints += pointsEarned;
-            let orderData = {
+            
+            // Save to Firestore
+            if (window.saveOrderToFirestore) {
+                let saved = await window.saveOrderToFirestore(order);
+                if (saved) {
+                    console.log("Order persisted to Firebase");
+                }
+            }
+            
+            // Update user points in Firestore
+            if (window.updateUserPointsInFirestore) {
+                await window.updateUserPointsInFirestore(user.id, loyaltyPoints);
+            }
+            
+            // Prepare data for Telegram bot
+            let orderDataForBot = {
                 userId: user.id,
                 userName: user.firstName + (user.lastName ? ' ' + user.lastName : ''),
                 username: user.username || '',
@@ -529,16 +661,18 @@
                 totalPoints: loyaltyPoints,
                 timestamp: new Date().toISOString()
             };
+            
             cart = [];
             updateCartCount();
             updateCartDisplay();
             updateProfileInfo();
             saveData();
-            tg.sendData(JSON.stringify(orderData));
+            tg.sendData(JSON.stringify(orderDataForBot));
             showToast(`✅ Order placed! Earned ${pointsEarned} points`);
             tg.HapticFeedback.notificationOccurred('success');
             switchTab('profile');
         }
+        // NEW END
 
         function updateProfileInfo() {
             document.getElementById('profileInfo').innerHTML = `
