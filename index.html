@@ -291,12 +291,15 @@
 
     <div id="toast" class="toast hidden"></div>
 
-    <!-- ==================== MAIN APP SCRIPT (with Firebase integration) ==================== -->
-    <!-- NEW START: Firebase SDK and Firestore setup -->
+    <!-- ==================== FIREBASE MODULE ==================== -->
+    <!-- NEW/FIXED START: Firebase imports with all needed functions -->
     <script type="module">
-        // Import Firebase modules
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
-        import { getFirestore, doc, setDoc, getDoc, updateDoc, arrayUnion, increment, onSnapshot } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+        import { 
+            getFirestore, doc, setDoc, getDoc, updateDoc, 
+            collection, query, where, orderBy, getDocs, 
+            onSnapshot, serverTimestamp 
+        } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
         
         // Your Firebase configuration (REPLACE WITH YOUR OWN FROM FIREBASE CONSOLE)
         const firebaseConfig = {
@@ -312,11 +315,9 @@
         // Initialize Firebase
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
-        
-        // Make db available globally (so other functions can use it)
         window.db = db;
         
-        // Function to save an order to Firestore
+        // Save order to Firestore
         window.saveOrderToFirestore = async function(orderData) {
             try {
                 const orderRef = doc(db, "orders", orderData.orderId);
@@ -329,11 +330,11 @@
             }
         };
         
-        // Function to update user points in Firestore
+        // Update user points
         window.updateUserPointsInFirestore = async function(userId, newPoints) {
             try {
                 const userRef = doc(db, "users", userId);
-                await setDoc(userRef, { points: newPoints, lastUpdated: new Date().toISOString() }, { merge: true });
+                await setDoc(userRef, { points: newPoints, lastUpdated: serverTimestamp() }, { merge: true });
                 console.log(`✅ Points updated for ${userId}: ${newPoints}`);
                 return true;
             } catch (error) {
@@ -342,41 +343,49 @@
             }
         };
         
-        // Function to load user points from Firestore
+        // Load user points
         window.loadUserPointsFromFirestore = async function(userId) {
             try {
                 const userRef = doc(db, "users", userId);
                 const docSnap = await getDoc(userRef);
                 if (docSnap.exists()) {
                     return docSnap.data().points || 0;
-                } else {
-                    return 0;
                 }
+                return 0;
             } catch (error) {
                 console.error("❌ Failed to load points:", error);
                 return 0;
             }
         };
         
-        // Function to load order history from Firestore
+        // NEW/FIXED START: Load orders from Firestore (cross‑device sync)
         window.loadOrdersFromFirestore = async function(userId) {
             try {
-                // We'll use a simple query: orders where userId matches
-                // For simplicity, we'll store orders in a subcollection or filter manually
-                // Here we assume order documents have a field "userId"
-                // Since Firestore doesn't support "get all documents where userId = x" without an index,
-                // we'll use a different approach: store orders in a subcollection of the user document.
-                // But to keep it simple for now, we'll just return an empty array and rely on local storage.
-                // For production, you'd set up an index or use subcollections.
-                console.log("Order history loading from Firestore - implement based on your structure");
-                return [];
+                const ordersRef = collection(db, "orders");
+                // Requires composite index: userId (Ascending) + timestamp (Descending)
+                const q = query(ordersRef, where("userId", "==", userId), orderBy("timestamp", "desc"));
+                const querySnapshot = await getDocs(q);
+                const orders = [];
+                querySnapshot.forEach((doc) => {
+                    const data = doc.data();
+                    orders.push({
+                        id: data.orderId,
+                        date: data.timestamp ? new Date(data.timestamp).toLocaleString() : "Unknown date",
+                        items: data.items.map(i => i.name),
+                        total: data.total,
+                        status: data.status || "Confirmed",
+                        pointsEarned: data.pointsEarned || 0
+                    });
+                });
+                return orders;
             } catch (error) {
-                console.error("Error loading orders:", error);
+                console.error("Error loading orders from Firestore:", error);
                 return [];
             }
         };
+        // NEW/FIXED END
         
-        // Real-time listener for user points
+        // Real-time points listener
         window.listenToUserPoints = function(userId, callback) {
             const userRef = doc(db, "users", userId);
             return onSnapshot(userRef, (docSnap) => {
@@ -391,7 +400,6 @@
         
         console.log("Firebase initialized and ready");
     </script>
-    <!-- NEW END -->
 
     <script>
         const tg = window.Telegram.WebApp;
@@ -606,12 +614,16 @@
         }
 
 
-        // NEW START: Modified checkout with Firebase save
+        // NEW/FIXED START: Modified checkout with Firestore save and Cambodia time
         async function checkout() {
             if (cart.length === 0) { showToast('Cart empty'); return; }
             let total = cart.reduce((s, i) => s + i.price, 0);
             let pointsEarned = Math.floor(total);
             let orderId = 'ORD_' + user.id + '_' + Date.now();
+            
+            // Cambodia local time string for bot display
+            const cambodiaTime = new Date().toLocaleString("en-CA", { timeZone: "Asia/Phnom_Penh", hour12: false });
+            
             let order = {
                 orderId: orderId,
                 userId: user.id,
@@ -621,7 +633,7 @@
                 total: total,
                 pointsEarned: pointsEarned,
                 status: 'Confirmed',
-                timestamp: new Date().toLocaleString("en-CA", { timeZone: "Asia/Phnom_Penh", hour12: false })
+                timestamp: new Date().toISOString()  // UTC for Firestore query
             };
             
             // Update local state
@@ -637,18 +649,13 @@
             
             // Save to Firestore
             if (window.saveOrderToFirestore) {
-                let saved = await window.saveOrderToFirestore(order);
-                if (saved) {
-                    console.log("Order persisted to Firebase");
-                }
+                await window.saveOrderToFirestore(order);
             }
-            
-            // Update user points in Firestore
             if (window.updateUserPointsInFirestore) {
                 await window.updateUserPointsInFirestore(user.id, loyaltyPoints);
             }
             
-            // Prepare data for Telegram bot
+            // Data for Telegram bot (local time string)
             let orderDataForBot = {
                 userId: user.id,
                 userName: user.firstName + (user.lastName ? ' ' + user.lastName : ''),
@@ -659,7 +666,7 @@
                 total: total.toFixed(2),
                 points: pointsEarned,
                 totalPoints: loyaltyPoints,
-                timestamp: new Date().toISOString()
+                timestamp: cambodiaTime
             };
             
             cart = [];
@@ -669,10 +676,10 @@
             saveData();
             tg.sendData(JSON.stringify(orderDataForBot));
             showToast(`✅ Order placed! Earned ${pointsEarned} points`);
-            tg.HapticFeedback.notificationOccurred('success');
+            if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
             switchTab('profile');
         }
-        // NEW END
+        // NEW/FIXED END
 
         function updateProfileInfo() {
             document.getElementById('profileInfo').innerHTML = `
@@ -708,17 +715,74 @@
             setTimeout(() => toast.classList.add('hidden'), 2000);
         }
 
-        function startApp() {
+        // NEW/FIXED START: Modified startApp to load orders from Firestore
+        async function startApp() {
             document.getElementById('userInfo').textContent = `Welcome, ${user.firstName}!`;
             if (user.photoUrl) document.getElementById('profileAvatar').innerHTML = `<img src="${user.photoUrl}" style="width:100%; border-radius:50%;">`;
-            loadData();
+            
+            // Load cart and points
+            let savedCart = localStorage.getItem(`cart_${user.id}`);
+            if (savedCart) cart = JSON.parse(savedCart);
+            updateCartCount();
+            updateCartDisplay();
+            
+            // Load points from Firestore or localStorage
+            if (window.loadUserPointsFromFirestore && user.id) {
+                let firestorePoints = await window.loadUserPointsFromFirestore(user.id);
+                if (firestorePoints > 0) {
+                    loyaltyPoints = firestorePoints;
+                } else {
+                    let savedPoints = localStorage.getItem(`points_${user.id}`);
+                    if (savedPoints) loyaltyPoints = parseInt(savedPoints);
+                }
+            } else {
+                let savedPoints = localStorage.getItem(`points_${user.id}`);
+                if (savedPoints) loyaltyPoints = parseInt(savedPoints);
+            }
+            
+            // NEW/FIXED START: Load orders from Firestore (cross‑device sync)
+            if (window.loadOrdersFromFirestore && user.id) {
+                try {
+                    const firestoreOrders = await window.loadOrdersFromFirestore(user.id);
+                    if (firestoreOrders.length > 0) {
+                        orderHistory = firestoreOrders;
+                        // Cache to localStorage
+                        localStorage.setItem(`orders_${user.id}`, JSON.stringify(orderHistory));
+                    } else {
+                        const savedOrders = localStorage.getItem(`orders_${user.id}`);
+                        if (savedOrders) orderHistory = JSON.parse(savedOrders);
+                    }
+                } catch (e) {
+                    console.warn("Firestore order load failed, using localStorage", e);
+                    const savedOrders = localStorage.getItem(`orders_${user.id}`);
+                    if (savedOrders) orderHistory = JSON.parse(savedOrders);
+                }
+            } else {
+                const savedOrders = localStorage.getItem(`orders_${user.id}`);
+                if (savedOrders) orderHistory = JSON.parse(savedOrders);
+            }
+            // NEW/FIXED END
+
             renderMenu();
             updateProfileInfo();
-            // attach tab listeners
+            
+            // Real-time points listener
+            if (window.listenToUserPoints && user.id) {
+                if (unsubscribePoints) unsubscribePoints();
+                unsubscribePoints = window.listenToUserPoints(user.id, (newPoints) => {
+                    if (newPoints !== loyaltyPoints) {
+                        loyaltyPoints = newPoints;
+                        updateProfileInfo();
+                        saveData();
+                    }
+                });
+            }
+            
+            // Tab listeners
             document.querySelectorAll('.tab').forEach(tab => {
                 tab.addEventListener('click', () => switchTab(tab.getAttribute('data-tab')));
             });
-            // category filters
+            // Category filters
             document.querySelectorAll('.filter-btn').forEach(btn => {
                 btn.addEventListener('click', () => {
                     document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
@@ -728,12 +792,12 @@
                 });
             });
         }
+        // NEW/FIXED END
 
-        // If user is already set (from Telegram or localStorage), start immediately
+        // Start the app if user exists, else name prompt will call startApp
         if (user.id !== 'guest') {
             startApp();
         }
-        // else, the prompt will call startApp() after name is entered
     </script>
 </body>
 </html>
