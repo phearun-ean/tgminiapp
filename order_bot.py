@@ -2,7 +2,7 @@ import logging
 import json
 import os
 from datetime import datetime
-from telegram import Update, KeyboardButton, ReplyKeyboardMarkup, WebAppInfo, InlineKeyboardButton, InlineKeyboardMarkup
+from telegram import Update, KeyboardButton, ReplyKeyboardMarkup, WebAppInfo, InlineKeyboardButton, InlineKeyboardMarkup, MenuButtonWebApp
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes, CallbackQueryHandler
 from dotenv import load_dotenv
 
@@ -46,6 +46,15 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(
         "Welcome to Bird Nest House! 🥚\nClick the button below to place your order:",
         reply_markup=reply_markup
+    )
+    
+    # --- NEW: set persistent menu button ---
+    await context.bot.set_chat_menu_button(
+        chat_id=update.effective_chat.id,
+        menu_button=MenuButtonWebApp(
+            text="🍽️ Open Bird Nest House",
+            web_app=WebAppInfo(url=YOUR_WEB_APP_URL)
+        )
     )
 
 async def handle_order(update: Update, context: ContextTypes.DEFAULT_TYPE):
