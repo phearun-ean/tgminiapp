@@ -9,7 +9,7 @@ from dotenv import load_dotenv
 load_dotenv()
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 SELLER_CHAT_ID = "455774531"   # Your numeric chat ID
-YOUR_WEB_APP_URL = "https://phearun-ean.github.io/tgminiapp/"
+YOUR_WEB_APP_URL = "https://birdnesttgminiapp.web.app/"
 
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -52,7 +52,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await context.bot.set_chat_menu_button(
         chat_id=update.effective_chat.id,
         menu_button=MenuButtonWebApp(
-            text="🍽️ Open Order Menu1",
+            text="🍽️ Open Order Menu",
             web_app=WebAppInfo(url=YOUR_WEB_APP_URL)
         )
     )
