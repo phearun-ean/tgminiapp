@@ -294,7 +294,6 @@
     <div id="toast" class="toast hidden"></div>
 
     <!-- ==================== FIREBASE MODULE ==================== -->
-    <!-- NEW/FIXED START: Firebase imports with all needed functions -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
         import { 
@@ -303,7 +302,7 @@
             onSnapshot, serverTimestamp 
         } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
         
-        // Your Firebase configuration (REPLACE WITH YOUR OWN FROM FIREBASE CONSOLE)
+        // Your Firebase configuration
         const firebaseConfig = {
             apiKey: "AIzaSyDUox5I6RG7sFABAyX_tUXi4rhiX80MDTY",
             authDomain: "birdnesttgminiapp.firebaseapp.com",
@@ -360,11 +359,11 @@
             }
         };
         
-        // NEW/FIXED START: Load orders from Firestore (cross‑device sync)
+        // Load orders from Firestore
         window.loadOrdersFromFirestore = async function(userId) {
             try {
                 const ordersRef = collection(db, "orders");
-                // Requires composite index: userId (Ascending) + timestamp (Descending)
+                // Note: Composite index required for userId + timestamp descending
                 const q = query(ordersRef, where("userId", "==", userId), orderBy("timestamp", "desc"));
                 const querySnapshot = await getDocs(q);
                 const orders = [];
@@ -385,7 +384,6 @@
                 return [];
             }
         };
-        // NEW/FIXED END
         
         // Real-time points listener
         window.listenToUserPoints = function(userId, callback) {
@@ -406,6 +404,10 @@
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand();
+        
+        // ----- DECLARE GLOBALS -----
+        let unsubscribePoints = null;      // FIX: declared
+        let renderTimeout = null;          // for loader timeout management
 
         // ---------- MENU DATA ----------
         const menuItems = [
@@ -440,7 +442,7 @@
             if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
                 const u = tg.initDataUnsafe.user;
                 return {
-                    id: u.id || 'guest',
+                    id: String(u.id || 'guest'),   // convert to string for Firestore
                     firstName: u.first_name || 'Guest',
                     lastName: u.last_name || '',
                     username: u.username || '',
@@ -497,22 +499,10 @@
         let orderHistory = [];
         let currentCategory = "all";
 
-        // Helper functions
         function saveData() {
             localStorage.setItem(`cart_${user.id}`, JSON.stringify(cart));
             localStorage.setItem(`points_${user.id}`, loyaltyPoints);
             localStorage.setItem(`orders_${user.id}`, JSON.stringify(orderHistory));
-        }
-
-        function loadData() {
-            let savedCart = localStorage.getItem(`cart_${user.id}`);
-            let savedPoints = localStorage.getItem(`points_${user.id}`);
-            let savedOrders = localStorage.getItem(`orders_${user.id}`);
-            if (savedCart) cart = JSON.parse(savedCart);
-            if (savedPoints) loyaltyPoints = parseInt(savedPoints);
-            if (savedOrders) orderHistory = JSON.parse(savedOrders);
-            updateCartCount();
-            updateCartDisplay();
         }
 
         function updateCartCount() {
@@ -570,7 +560,7 @@
             updateCartDisplay();
             saveData();
             showToast(`Added ${qty} x ${item.name}`);
-            tg.HapticFeedback.impactOccurred('light');
+            if (tg.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
         }
 
         function adjustQuantity(id, delta) {
@@ -585,7 +575,11 @@
             let grid = document.getElementById('menuGrid');
             let loader = document.getElementById('menuLoader');
             loader.classList.remove('hidden');
-            setTimeout(() => {
+            
+            // Clear previous timeout to avoid race conditions
+            if (renderTimeout) clearTimeout(renderTimeout);
+            
+            renderTimeout = setTimeout(() => {
                 loader.classList.add('hidden');
                 let filtered = currentCategory === 'all' ? menuItems : menuItems.filter(i => i.category === currentCategory);
                 if (filtered.length === 0) {
@@ -615,8 +609,7 @@
             }, 200);
         }
 
-
-        // NEW/FIXED START: Modified checkout with Firestore save and Cambodia time
+        // FIXED: Checkout with proper error handling and haptic check
         async function checkout() {
             if (cart.length === 0) { showToast('Cart empty'); return; }
             let total = cart.reduce((s, i) => s + i.price, 0);
@@ -638,7 +631,7 @@
                 timestamp: new Date().toISOString()  // UTC for Firestore query
             };
             
-            // Update local state
+            // Update local state (optimistic)
             orderHistory.unshift({
                 id: orderId,
                 date: new Date().toLocaleString(),
@@ -649,15 +642,22 @@
             });
             loyaltyPoints += pointsEarned;
             
-            // Save to Firestore
+            // Try to save to Firestore, but don't block UI if fails
+            let firestoreSuccess = true;
             if (window.saveOrderToFirestore) {
-                await window.saveOrderToFirestore(order);
+                const saved = await window.saveOrderToFirestore(order);
+                if (!saved) firestoreSuccess = false;
             }
             if (window.updateUserPointsInFirestore) {
-                await window.updateUserPointsInFirestore(user.id, loyaltyPoints);
+                const pointsUpdated = await window.updateUserPointsInFirestore(user.id, loyaltyPoints);
+                if (!pointsUpdated) firestoreSuccess = false;
             }
             
-            // Data for Telegram bot (local time string)
+            if (!firestoreSuccess) {
+                showToast("⚠️ Order saved locally but cloud sync failed. Contact support.");
+            }
+            
+            // Data for Telegram bot
             let orderDataForBot = {
                 userId: user.id,
                 userName: user.firstName + (user.lastName ? ' ' + user.lastName : ''),
@@ -681,7 +681,6 @@
             if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
             switchTab('profile');
         }
-        // NEW/FIXED END
 
         function updateProfileInfo() {
             document.getElementById('profileInfo').innerHTML = `
@@ -717,12 +716,11 @@
             setTimeout(() => toast.classList.add('hidden'), 2000);
         }
 
-        // NEW/FIXED START: Modified startApp to load orders from Firestore
         async function startApp() {
             document.getElementById('userInfo').textContent = `Welcome, ${user.firstName}!`;
             if (user.photoUrl) document.getElementById('profileAvatar').innerHTML = `<img src="${user.photoUrl}" style="width:100%; border-radius:50%;">`;
             
-            // Load cart and points
+            // Load cart from localStorage
             let savedCart = localStorage.getItem(`cart_${user.id}`);
             if (savedCart) cart = JSON.parse(savedCart);
             updateCartCount();
@@ -742,13 +740,12 @@
                 if (savedPoints) loyaltyPoints = parseInt(savedPoints);
             }
             
-            // NEW/FIXED START: Load orders from Firestore (cross‑device sync)
+            // Load orders from Firestore (cross‑device sync)
             if (window.loadOrdersFromFirestore && user.id) {
                 try {
                     const firestoreOrders = await window.loadOrdersFromFirestore(user.id);
                     if (firestoreOrders.length > 0) {
                         orderHistory = firestoreOrders;
-                        // Cache to localStorage
                         localStorage.setItem(`orders_${user.id}`, JSON.stringify(orderHistory));
                     } else {
                         const savedOrders = localStorage.getItem(`orders_${user.id}`);
@@ -763,12 +760,11 @@
                 const savedOrders = localStorage.getItem(`orders_${user.id}`);
                 if (savedOrders) orderHistory = JSON.parse(savedOrders);
             }
-            // NEW/FIXED END
-
+            
             renderMenu();
             updateProfileInfo();
             
-            // Real-time points listener
+            // Real-time points listener (clean previous if any)
             if (window.listenToUserPoints && user.id) {
                 if (unsubscribePoints) unsubscribePoints();
                 unsubscribePoints = window.listenToUserPoints(user.id, (newPoints) => {
@@ -794,7 +790,6 @@
                 });
             });
         }
-        // NEW/FIXED END
 
         // Start the app if user exists, else name prompt will call startApp
         if (user.id !== 'guest') {
