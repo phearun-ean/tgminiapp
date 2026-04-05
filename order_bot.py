@@ -35,7 +35,7 @@ order_storage = load_orders()
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     button = KeyboardButton(
-        text="🍽️ Open Bird Nest House",
+        text="🍽️ Open Order menu",
         web_app=WebAppInfo(url=YOUR_WEB_APP_URL)
     )
     reply_markup = ReplyKeyboardMarkup(
@@ -52,7 +52,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await context.bot.set_chat_menu_button(
         chat_id=update.effective_chat.id,
         menu_button=MenuButtonWebApp(
-            text="🍽️ Open Bird Nest House",
+            text="🍽️ Open Order Menu1",
             web_app=WebAppInfo(url=YOUR_WEB_APP_URL)
         )
     )
