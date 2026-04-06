@@ -493,6 +493,18 @@
             };
         }
 
+        // ---------- Persistent Cart Functions (NEW) ----------
+        function loadSavedCart() {
+            const savedCart = localStorage.getItem(`cart_${user.id}`);
+            if (savedCart) {
+                cart = JSON.parse(savedCart);
+                updateCartCount();
+                updateCartDisplay();
+                console.log("🛒 Persistent cart loaded:", cart.length, "items");
+            }
+        }
+        // -------------------------------------------------------
+
         // ---------- APP STATE ----------
         let cart = [];
         let loyaltyPoints = 0;
