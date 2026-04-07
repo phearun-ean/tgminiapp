@@ -76,6 +76,8 @@
         .lang-selector { display: flex; justify-content: flex-end; gap: 8px; padding: 10px 15px 0; }
         .lang-btn { background: #f0f0f0; border: none; padding: 5px 12px; border-radius: 20px; cursor: pointer; font-size: 0.8rem; }
         .lang-btn.active { background: var(--primary); color: white; }
+        /* Chat modal specific */
+        #chatMessages { height: 300px; overflow-y: auto; border: 1px solid #ddd; padding: 10px; margin-bottom: 10px; background: #fafafa; }
     </style>
 </head>
 <body>
@@ -178,13 +180,24 @@
         </div>
     </div>
 
-    <!-- Firebase Module (unchanged) -->
+    <!-- Chat Modal -->
+    <div id="chatModal" class="modal hidden">
+        <div class="modal-content" style="max-width: 500px;">
+            <h3 id="chatTitle">Chat with Seller</h3>
+            <div id="chatMessages"></div>
+            <textarea id="chatInput" placeholder="Type your message..." rows="2" style="width:100%; padding: 8px; border-radius: 15px;"></textarea>
+            <button id="sendChatBtn" style="margin-top: 10px; background: var(--primary); color: white; border: none; padding: 10px; border-radius: 25px;">Send</button>
+            <button onclick="closeChatModal()" style="margin-top: 10px; background: #ccc;">Cancel</button>
+        </div>
+    </div>
+
+    <!-- Firebase Module (with increment) -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
         import { 
             getFirestore, doc, setDoc, getDoc, updateDoc, 
             collection, query, where, orderBy, getDocs, 
-            onSnapshot, serverTimestamp, addDoc
+            onSnapshot, serverTimestamp, addDoc, increment
         } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
         
         const firebaseConfig = {
@@ -200,6 +213,7 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         window.db = db;
+        window.increment = increment;
         
         window.saveOrderToFirestore = async function(orderData) { try { await setDoc(doc(db, "orders", orderData.orderId), orderData); return true; } catch(e) { return false; } };
         window.updateUserPointsInFirestore = async function(userId, newPoints) { try { await setDoc(doc(db, "users", userId), { points: newPoints, lastUpdated: serverTimestamp() }, { merge: true }); return true; } catch(e) { return false; } };
@@ -342,23 +356,20 @@
             document.getElementById('paymentTotalText').innerHTML = t.paymentTotalText + '<span id="paymentAmount">0.00</span>';
             document.getElementById('mockPayBtn').innerText = t.cardPay;
             document.getElementById('codPayBtn').innerText = t.codPay;
-            // Update dynamic texts that may have been set already
             if (typeof updateProfileInfo === 'function') updateProfileInfo();
             if (typeof updateCartDisplay === 'function') updateCartDisplay();
             if (typeof renderMenu === 'function') renderMenu();
-            // Update any visible toast or other elements
             document.querySelectorAll('.lang-btn').forEach(btn => {
                 if (btn.dataset.lang === lang) btn.classList.add('active');
                 else btn.classList.remove('active');
             });
         }
 
-        // Language switcher event listeners
         document.querySelectorAll('.lang-btn').forEach(btn => {
             btn.addEventListener('click', () => applyLanguage(btn.dataset.lang));
         });
 
-        // ==================== REST OF THE APP (unchanged logic, only using translations for strings) ====================
+        // ==================== APP CORE ====================
         const tg = window.Telegram.WebApp;
         tg.expand();
         
@@ -368,7 +379,7 @@
         let appliedPromoCode = null;
         let redeemedPointsUsed = 0;
 
-        const menuItems = [ /* same as before */ 
+        const menuItems = [ /* unchanged */ 
             { id: 1, name: "Bird Nest 75ml (general)", description: "100% pure bird's nests, ready to drink", price: 5, category: "bird nest drinks", image: "https://i.postimg.cc/rw3v9gyK/75ml.png" },
             { id: 2, name: "Bird Nest 75ml (6 bottles)", description: "100% pure bird's nests", price: 30, category: "bird nest drinks", image: "https://i.postimg.cc/Dw89sRhZ/75ml_6bottle.png" },
             { id: 3, name: "Bird Nest 75ml (6 bottles original)", description: "Original taste", price: 30, category: "bird nest drinks", image: "https://i.postimg.cc/vZcJ9Cyc/75ml_6bottle_original.png" },
@@ -608,7 +619,7 @@
             closePaymentModal();
         }
 
-        // Reviews (unchanged logic, but use translated strings inside functions)
+        // Reviews
         let currentProductForReview = null;
         function renderStars(rating) { return '★'.repeat(rating) + '☆'.repeat(5-rating); }
         async function updateReviewSummary(productId, elementId) {
@@ -688,7 +699,16 @@
             document.getElementById('pointsValue').textContent = loyaltyPoints;
             let historyDiv = document.getElementById('orderHistory');
             if (orderHistory.length === 0) historyDiv.innerHTML = '<p>No orders yet.</p>';
-            else historyDiv.innerHTML = orderHistory.map(o => `<div style="background:#f9f9f9; border-radius:15px; padding:15px; margin-bottom:10px;"><b>${o.id}</b> - ${o.date}<br>${o.items.slice(0,3).join(', ')}${o.items.length>3?'...':''}<br>Total: $${o.total.toFixed(2)}<br>${t.orderStatusPrefix}${o.status}<br>Earned ${o.pointsEarned} ${t.pointsLabel}</div>`).join('');
+            else historyDiv.innerHTML = orderHistory.map(o => `
+                <div style="background:#f9f9f9; border-radius:15px; padding:15px; margin-bottom:10px;">
+                    <b>${o.id}</b> - ${o.date}<br>
+                    ${o.items.slice(0,3).join(', ')}${o.items.length>3?'...':''}<br>
+                    Total: $${o.total.toFixed(2)}<br>
+                    ${t.orderStatusPrefix}${o.status}<br>
+                    Earned ${o.pointsEarned} ${t.pointsLabel}<br>
+                    <button onclick="openChatModal('${o.id}', '${user.firstName}')" style="margin-top:8px; background:var(--primary); color:white; border:none; padding:6px 12px; border-radius:20px;">💬 Chat with Seller</button>
+                </div>
+            `).join('');
         }
 
         function switchTab(tabName) {
@@ -707,6 +727,63 @@
             setTimeout(() => toast.classList.add('hidden'), 2000);
         }
 
+        // ==================== CHAT FUNCTIONS ====================
+        let currentChatOrderId = null;
+        let chatUnsubscribe = null;
+
+        function openChatModal(orderId, customerName) {
+            if (chatUnsubscribe) chatUnsubscribe();
+            currentChatOrderId = orderId;
+            document.getElementById('chatTitle').innerText = `Chat with Seller (Order ${orderId})`;
+            document.getElementById('chatMessages').innerHTML = '<div style="text-align:center;">Loading messages...</div>';
+            document.getElementById('chatModal').classList.remove('hidden');
+            
+            const q = query(collection(window.db, "chat_messages"), where("orderId", "==", orderId), orderBy("timestamp", "asc"));
+            chatUnsubscribe = onSnapshot(q, (snapshot) => {
+                const container = document.getElementById('chatMessages');
+                if (snapshot.empty) {
+                    container.innerHTML = '<div style="text-align:center; color:#888;">No messages yet. Start the conversation!</div>';
+                    return;
+                }
+                let html = '';
+                snapshot.forEach(doc => {
+                    const msg = doc.data();
+                    const isSeller = msg.fromId === 'seller';
+                    html += `<div style="margin-bottom: 8px; text-align: ${isSeller ? 'left' : 'right'};">
+                        <strong>${isSeller ? '🛒 Seller' : '👤 You'}:</strong><br>
+                        <span style="background: ${isSeller ? '#e9ecef' : '#ff6b00'}; padding: 8px; border-radius: 12px; display: inline-block; max-width: 80%; color: ${isSeller ? '#000' : '#fff'};">${escapeHtml(msg.text)}</span>
+                        <div style="font-size: 0.7rem; color: #888;">${msg.timestamp ? new Date(msg.timestamp.toDate()).toLocaleTimeString() : ''}</div>
+                    </div>`;
+                });
+                container.innerHTML = html;
+                container.scrollTop = container.scrollHeight;
+            });
+        }
+
+        async function sendChatMessage() {
+            if (!currentChatOrderId) return;
+            const input = document.getElementById('chatInput');
+            const text = input.value.trim();
+            if (!text) return;
+            input.value = '';
+            await addDoc(collection(window.db, "chat_messages"), {
+                orderId: currentChatOrderId,
+                fromId: user.id,
+                fromName: user.firstName,
+                text: text,
+                timestamp: new Date()
+            });
+            const threadRef = doc(window.db, "chat_threads", currentChatOrderId);
+            await setDoc(threadRef, { lastMessage: text, lastUpdated: new Date(), unreadCount: increment(1) }, { merge: true });
+        }
+
+        function closeChatModal() {
+            if (chatUnsubscribe) chatUnsubscribe();
+            document.getElementById('chatModal').classList.add('hidden');
+            currentChatOrderId = null;
+        }
+
+        // ==================== START APP ====================
         async function startApp() {
             document.getElementById('userInfo').textContent = `${translations[currentLang].welcomePrefix}${user.firstName}!`;
             if (user.photoUrl) document.getElementById('profileAvatar').innerHTML = `<img src="${user.photoUrl}" style="width:100%; border-radius:50%;">`;
@@ -743,7 +820,7 @@
             document.getElementById('mockPayBtn').onclick = handleCardPayment;
             document.getElementById('codPayBtn').onclick = handleCodPayment;
             document.getElementById('proceedPaymentBtn').onclick = proceedToPayment;
-            // Apply initial language
+            document.getElementById('sendChatBtn').onclick = sendChatMessage;
             applyLanguage(currentLang);
         }
 
