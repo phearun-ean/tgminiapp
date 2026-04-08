@@ -67,11 +67,13 @@
         .review-stars { color: #ffc107; font-size: 0.8rem; }
         .review-comment { color: #555; font-size: 0.85rem; margin-top: 4px; }
         .review-date { font-size: 0.7rem; color: #999; }
-        .redeem-section, .promo-section { background: #f9f9f9; border-radius: 15px; padding: 15px; margin: 15px 0; }
-        .redeem-btn { background: var(--primary); color: white; border: none; padding: 8px 16px; border-radius: 25px; cursor: pointer; }
+        .promo-section { background: #f9f9f9; border-radius: 15px; padding: 15px; margin: 15px 0; }
         .promo-input { display: flex; gap: 10px; margin-top: 10px; }
         .promo-input input { flex: 1; padding: 8px; border-radius: 25px; border: 1px solid #ddd; }
         .apply-promo-btn { background: var(--secondary); color: white; border: none; padding: 8px 16px; border-radius: 25px; cursor: pointer; }
+        /* Points selector */
+        .points-selector { background: #f9f9f9; border-radius: 15px; padding: 10px; margin-top: 5px; }
+        .points-selector input { width: 100%; padding: 8px; border-radius: 25px; border: 1px solid #ddd; }
         /* Language selector */
         .lang-selector { display: flex; justify-content: flex-end; gap: 8px; padding: 10px 15px 0; }
         .lang-btn { background: #f0f0f0; border: none; padding: 5px 12px; border-radius: 20px; cursor: pointer; font-size: 0.8rem; }
@@ -130,12 +132,6 @@
             <span class="points-value" id="pointsValue">0</span>
             <span id="pointsLabel">Loyalty Points</span>
         </div>
-        <div class="redeem-section">
-            <h4 id="redeemTitle">🎁 Redeem Points</h4>
-            <p id="redeemDesc">100 points = $1 off</p>
-            <button id="redeemPointsBtn" class="redeem-btn">Redeem Points</button>
-            <p id="redeemMessage" style="font-size:0.8rem; color:green; margin-top:8px;"></p>
-        </div>
         <h3 id="orderHistoryTitle">📋 Your Orders</h3>
         <div id="orderHistory"></div>
     </div>
@@ -144,6 +140,12 @@
         <div class="cart-summary-row"><span id="subtotalLabel">Subtotal:</span><div>$<span id="cartSubtotal">0.00</span></div></div>
         <div class="cart-summary-row" id="discountRow" style="display:none; color:green;"><span id="discountLabel">Discount:</span><div>-$<span id="cartDiscount">0.00</span></div></div>
         <div class="cart-summary-row"><strong id="totalLabel">Total:</strong><strong>$<span id="cartTotal">0.00</span></strong></div>
+        <!-- Points redemption UI -->
+        <div class="points-selector" id="pointsSelector" style="display:none;">
+            <label>🎁 Use points (100 pts = $1):</label>
+            <input type="range" id="pointsSlider" min="0" max="0" step="100" value="0">
+            <div><span id="pointsToUse">0</span> points = $<span id="pointsDiscount">0.00</span> off</div>
+        </div>
         <div class="promo-section">
             <div class="promo-input">
                 <input type="text" id="promoCodeInput" placeholder="Promo code">
@@ -191,7 +193,7 @@
         </div>
     </div>
 
-    <!-- Firebase Module (with increment) -->
+    <!-- Firebase Module (with increment and loadProducts) -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
         import { 
@@ -239,6 +241,23 @@
                 return true;
             } catch(e) { return false; }
         };
+        
+        // NEW: Load products from Firestore
+        window.loadProducts = async function() {
+            try {
+                const q = query(collection(db, "products"), orderBy("id"));
+                const snapshot = await getDocs(q);
+                const products = [];
+                snapshot.forEach(doc => {
+                    products.push({ docId: doc.id, ...doc.data() });
+                });
+                return products;
+            } catch(e) {
+                console.error("Failed to load products:", e);
+                return [];
+            }
+        };
+        
         console.log("Firebase ready");
     </script>
 
@@ -254,7 +273,6 @@
                 catAll: "All", catPromo: "🎁 Promotions", catDrinks: "🥤 Bird Nest Drinks", catDried: "🥚 Dried Bird Nest",
                 emptyCart: "🛒 Your cart is empty",
                 pointsLabel: "Loyalty Points",
-                redeemTitle: "🎁 Redeem Points", redeemDesc: "100 points = $1 off", redeemBtn: "Redeem Points",
                 orderHistoryTitle: "📋 Your Orders",
                 subtotalLabel: "Subtotal:", discountLabel: "Discount:", totalLabel: "Total:",
                 promoPlaceholder: "Promo code", applyPromo: "Apply", proceedPayment: "Proceed to Payment →",
@@ -262,7 +280,6 @@
                 paymentModalTitle: "💳 Payment Options", paymentTotalText: "Total to pay: $", cardPay: "💳 Pay with Card (Simulated)", codPay: "💵 Cash on Delivery",
                 toastOrderPlaced: "✅ Order placed! Payment method: {method}. Earned {points} points.",
                 toastCartEmpty: "Cart empty", toastItemRemoved: "Item removed", toastAdded: "Added {qty} x {name}",
-                toastNeedPoints: "Need at least 100 points to redeem", toastRedeemed: "Redeemed {points} points for ${discount} off!",
                 promoInvalid: "Invalid promo code", promoWelcome: "Promo applied: 10% off!", promoFreeShip: "Promo applied: $5 off!",
                 reviewSelectRating: "Select rating", reviewWriteComment: "Write a comment", reviewThankYou: "Thank you for your review!", reviewFailed: "Failed to submit",
                 cardProcessing: "Processing card payment...", codOrderPlaced: "Order placed with Cash on Delivery",
@@ -278,7 +295,6 @@
                 catAll: "ទាំងអស់", catPromo: "🎁 ការផ្សព្វផ្សាយ", catDrinks: "🥤 ភេសជ្ជៈសំបុកបក្សី", catDried: "🥚 សំបុកបក្សីស្ងួត",
                 emptyCart: "🛒 កន្ត្រករបស់អ្នកទទេ",
                 pointsLabel: "ពិន្ទុភក្ដីភាព",
-                redeemTitle: "🎁 ប្តូរពិន្ទុ", redeemDesc: "100 ពិន្ទុ = 1 ដុល្លារ បញ្ចុះតម្លៃ", redeemBtn: "ប្តូរពិន្ទុ",
                 orderHistoryTitle: "📋 ការបញ្ជាទិញរបស់អ្នក",
                 subtotalLabel: "សរុបរង:", discountLabel: "បញ្ចុះតម្លៃ:", totalLabel: "សរុប:",
                 promoPlaceholder: "កូដប្រូម៉ូ", applyPromo: "អនុវត្ត", proceedPayment: "ទៅកាន់ការទូទាត់ →",
@@ -286,7 +302,6 @@
                 paymentModalTitle: "💳 ជម្រើសទូទាត់", paymentTotalText: "សរុបត្រូវបង់: $", cardPay: "💳 បង់ដោយកាត (សាកល្បង)", codPay: "💵 បង់ត្រង់ពេលទទួល",
                 toastOrderPlaced: "✅ ការបញ្ជាទិញបានសម្រេច! វិធីទូទាត់: {method}. ទទួលបាន {points} ពិន្ទុ។",
                 toastCartEmpty: "កន្ត្រកទទេ", toastItemRemoved: "បានដករបស់ចេញ", toastAdded: "បានបន្ថែម {qty} x {name}",
-                toastNeedPoints: "ត្រូវការយ៉ាងហោចណាស់ 100 ពិន្ទុដើម្បីប្តូរ", toastRedeemed: "បានប្តូរ {points} ពិន្ទុ បញ្ចុះតម្លៃ ${discount}!",
                 promoInvalid: "កូដមិនត្រឹមត្រូវ", promoWelcome: "ប្រូម៉ូបានអនុវត្ត: បញ្ចុះ 10%!", promoFreeShip: "ប្រូម៉ូបានអនុវត្ត: បញ្ចុះ $5!",
                 reviewSelectRating: "ជ្រើសរើសផ្កាយ", reviewWriteComment: "សរសេរមតិ", reviewThankYou: "សូមអរគុណចំពោះការវាយតម្លៃរបស់អ្នក!", reviewFailed: "បរាជ័យក្នុងការដាក់ស្នើ",
                 cardProcessing: "កំពុងដំណើរការការទូទាត់ដោយកាត...", codOrderPlaced: "ការបញ្ជាទិញបានសម្រេចដោយបង់ត្រង់ពេលទទួល",
@@ -302,7 +317,6 @@
                 catAll: "全部", catPromo: "🎁 促销", catDrinks: "🥤 燕窝饮品", catDried: "🥚 干燕窝",
                 emptyCart: "🛒 您的购物车是空的",
                 pointsLabel: "忠诚积分",
-                redeemTitle: "🎁 兑换积分", redeemDesc: "100积分 = $1折扣", redeemBtn: "兑换积分",
                 orderHistoryTitle: "📋 您的订单",
                 subtotalLabel: "小计:", discountLabel: "折扣:", totalLabel: "总计:",
                 promoPlaceholder: "促销代码", applyPromo: "应用", proceedPayment: "继续支付 →",
@@ -310,7 +324,6 @@
                 paymentModalTitle: "💳 支付选项", paymentTotalText: "应付总额: $", cardPay: "💳 信用卡支付 (模拟)", codPay: "💵 货到付款",
                 toastOrderPlaced: "✅ 订单已提交！支付方式: {method}。获得 {points} 积分。",
                 toastCartEmpty: "购物车为空", toastItemRemoved: "商品已移除", toastAdded: "已添加 {qty} x {name}",
-                toastNeedPoints: "至少需要100积分才能兑换", toastRedeemed: "已兑换 {points} 积分，优惠 ${discount}!",
                 promoInvalid: "无效的促销代码", promoWelcome: "促销已应用: 10% 折扣!", promoFreeShip: "促销已应用: $5 折扣!",
                 reviewSelectRating: "选择星级", reviewWriteComment: "撰写评论", reviewThankYou: "感谢您的评价！", reviewFailed: "提交失败",
                 cardProcessing: "正在处理信用卡支付...", codOrderPlaced: "订单已提交，货到付款",
@@ -339,9 +352,6 @@
             document.getElementById('catDried').innerHTML = t.catDried;
             document.getElementById('emptyCartMsg').innerHTML = `🛒<p>${t.emptyCart}</p>`;
             document.getElementById('pointsLabel').innerText = t.pointsLabel;
-            document.getElementById('redeemTitle').innerText = t.redeemTitle;
-            document.getElementById('redeemDesc').innerText = t.redeemDesc;
-            document.getElementById('redeemPointsBtn').innerText = t.redeemBtn;
             document.getElementById('orderHistoryTitle').innerText = t.orderHistoryTitle;
             document.getElementById('subtotalLabel').innerText = t.subtotalLabel;
             document.getElementById('discountLabel').innerText = t.discountLabel;
@@ -377,25 +387,9 @@
         let renderTimeout = null;
         let appliedDiscount = 0;
         let appliedPromoCode = null;
-        let redeemedPointsUsed = 0;
-
-        const menuItems = [ /* unchanged */ 
-            { id: 1, name: "Bird Nest 75ml (general)", description: "100% pure bird's nests, ready to drink", price: 5, category: "bird nest drinks", image: "https://i.postimg.cc/rw3v9gyK/75ml.png" },
-            { id: 2, name: "Bird Nest 75ml (6 bottles)", description: "100% pure bird's nests", price: 30, category: "bird nest drinks", image: "https://i.postimg.cc/Dw89sRhZ/75ml_6bottle.png" },
-            { id: 3, name: "Bird Nest 75ml (6 bottles original)", description: "Original taste", price: 30, category: "bird nest drinks", image: "https://i.postimg.cc/vZcJ9Cyc/75ml_6bottle_original.png" },
-            { id: 4, name: "Bird Nest 75ml (diabetic)", description: "No added sugar", price: 5, category: "bird nest drinks", image: "https://i.postimg.cc/vZcJ9Cyc/75ml_6bottle_original.png" },
-            { id: 5, name: "Bird Nest 75ml (6 bottles diabetic)", description: "Diabetic-friendly", price: 30, category: "bird nest drinks", image: "https://i.postimg.cc/vZcJ9Cyc/75ml_6bottle_original.png" },
-            { id: 6, name: "Bird Nest 100ml", description: "100% pure", price: 10, category: "bird nest drinks", image: "https://i.postimg.cc/XYpRFtW7/100ml.png" },
-            { id: 7, name: "Bird Nest 150ml", description: "100% pure", price: 12, category: "bird nest drinks", image: "https://i.postimg.cc/htfkxNnQ/150ml.png" },
-            { id: 8, name: "Bird Nest 200ml", description: "100% pure", price: 15, category: "bird nest drinks", image: "https://i.postimg.cc/8s8mhCxR/200ml.png" },
-            { id: 9, name: "Bird Nest 250ml", description: "100% pure", price: 20, category: "bird nest drinks", image: "https://i.postimg.cc/PNGQmq0m/250ml.png" },
-            { id: 10, name: "Bird Nest 500ml", description: "100% pure", price: 50, category: "bird nest drinks", image: "https://i.postimg.cc/ZqZH0ChV/500ml.png" },
-            { id: 11, name: "Bird Nest 1000ml", description: "100% pure", price: 100, category: "bird nest drinks", image: "https://i.postimg.cc/Wb1Pq1sV/1000ml.png" },
-            { id: 12, name: "Bird Nest Grade A (100g)", description: "Dried, shelf-life 3 years", price: 290, category: "Dried bird nest", image: "https://i.postimg.cc/Pq6bSyBf/Grade_A.png" },
-            { id: 13, name: "Bird Nest Konkat (100g)", description: "Dried high quality", price: 250, category: "Dried bird nest", image: "https://i.postimg.cc/zXWNCP93/Konkat.png" },
-            { id: 14, name: "Bird Nest Num (100g)", description: "Dried", price: 180, category: "Dried bird nest", image: "https://i.postimg.cc/sXwxR035/Bird_s_Nest_Num1_100g.png" },
-            { id: 15, name: "Bird Nest Princess (100g)", description: "Premium dried", price: 200, category: "Dried bird nest", image: "" }
-        ];
+        let pointsToUse = 0;
+        let pointsDiscount = 0;
+        let menuItems = [];
 
         let user = { id: 'guest', firstName: 'Guest', lastName: '', username: '', photoUrl: null };
         let cart = [];
@@ -460,7 +454,7 @@
             let summary = document.getElementById('cartSummary');
             if (cart.length === 0) {
                 cartDiv.innerHTML = ''; emptyCart.classList.remove('hidden'); summary.classList.add('hidden');
-                appliedDiscount = 0; appliedPromoCode = null; redeemedPointsUsed = 0;
+                appliedDiscount = 0; appliedPromoCode = null; pointsToUse = 0; pointsDiscount = 0;
                 return;
             }
             emptyCart.classList.add('hidden');
@@ -472,14 +466,36 @@
                 <button class="remove-btn" onclick="removeItem(${g.item.id})">Remove</button></div>
             `).join('');
             let subtotal = cart.reduce((s, i) => s + i.price, 0);
-            let total = subtotal - appliedDiscount;
+            let totalDiscount = (appliedDiscount || 0) + pointsDiscount;
+            let total = subtotal - totalDiscount;
             if (total < 0) total = 0;
             document.getElementById('cartSubtotal').textContent = subtotal.toFixed(2);
             document.getElementById('cartTotal').textContent = total.toFixed(2);
-            if (appliedDiscount > 0) {
+            if (totalDiscount > 0) {
                 document.getElementById('discountRow').style.display = 'flex';
-                document.getElementById('cartDiscount').textContent = appliedDiscount.toFixed(2);
+                document.getElementById('cartDiscount').textContent = totalDiscount.toFixed(2);
             } else document.getElementById('discountRow').style.display = 'none';
+            
+            const pointsSelector = document.getElementById('pointsSelector');
+            if (loyaltyPoints >= 100 && cart.length > 0) {
+                pointsSelector.style.display = 'block';
+                const slider = document.getElementById('pointsSlider');
+                const maxPoints = Math.floor(loyaltyPoints / 100) * 100;
+                slider.max = maxPoints;
+                slider.value = Math.min(pointsToUse, maxPoints);
+                updatePointsDisplay();
+            } else {
+                pointsSelector.style.display = 'none';
+            }
+        }
+
+        function updatePointsDisplay() {
+            const slider = document.getElementById('pointsSlider');
+            pointsToUse = parseInt(slider.value) || 0;
+            pointsDiscount = pointsToUse / 100;
+            document.getElementById('pointsToUse').innerText = pointsToUse;
+            document.getElementById('pointsDiscount').innerText = pointsDiscount.toFixed(2);
+            updateCartDisplay();
         }
 
         function removeItem(id) {
@@ -508,7 +524,6 @@
             span.textContent = val;
         }
 
-        // Promo Code
         function applyPromoCode() {
             const code = document.getElementById('promoCodeInput').value.trim().toUpperCase();
             let discount = 0, message = '';
@@ -532,28 +547,9 @@
             document.getElementById('promoMessage').style.color = message.includes('Invalid') ? 'red' : 'green';
         }
 
-        // Loyalty Redeem
-        async function redeemPoints() {
-            if (loyaltyPoints < 100) { showToast(translations[currentLang].toastNeedPoints); return; }
-            let pointsToUse = Math.floor(loyaltyPoints / 100) * 100;
-            let discountDollars = pointsToUse / 100;
-            let subtotal = cart.reduce((s,i) => s + i.price, 0);
-            if (discountDollars > subtotal) discountDollars = subtotal;
-            appliedDiscount = discountDollars;
-            redeemedPointsUsed = pointsToUse;
-            loyaltyPoints -= pointsToUse;
-            await window.updateUserPointsInFirestore(user.id, loyaltyPoints);
-            updateProfileInfo();
-            updateCartDisplay();
-            showToast(translations[currentLang].toastRedeemed.replace('{points}', pointsToUse).replace('{discount}', discountDollars));
-            document.getElementById('redeemMessage').textContent = translations[currentLang].toastRedeemed.replace('{points}', pointsToUse).replace('{discount}', discountDollars);
-            setTimeout(() => document.getElementById('redeemMessage').textContent = '', 3000);
-        }
-
-        // Payment and Order
         function proceedToPayment() {
             if (cart.length === 0) { showToast(translations[currentLang].toastCartEmpty); return; }
-            let total = cart.reduce((s,i) => s + i.price, 0) - appliedDiscount;
+            let total = cart.reduce((s,i) => s + i.price, 0) - (appliedDiscount || 0) - pointsDiscount;
             if (total < 0) total = 0;
             document.getElementById('paymentAmount').textContent = total.toFixed(2);
             document.getElementById('paymentModal').classList.remove('hidden');
@@ -562,18 +558,26 @@
         function closePaymentModal() { document.getElementById('paymentModal').classList.add('hidden'); }
 
         async function completeOrder(paymentMethod) {
-            let total = cart.reduce((s,i) => s + i.price, 0) - appliedDiscount;
+            let subtotal = cart.reduce((s,i) => s + i.price, 0);
+            let total = subtotal - (appliedDiscount || 0) - pointsDiscount;
             if (total < 0) total = 0;
             let pointsEarned = Math.floor(total);
             let orderId = 'ORD_' + user.id + '_' + Date.now();
             const cambodiaTime = new Date().toLocaleString("en-CA", { timeZone: "Asia/Phnom_Penh", hour12: false });
+            
+            if (pointsToUse > 0) {
+                loyaltyPoints -= pointsToUse;
+                await window.updateUserPointsInFirestore(user.id, loyaltyPoints);
+            }
+            
             let order = {
                 orderId, userId: user.id,
                 userName: user.firstName + (user.lastName ? ' ' + user.lastName : ''),
                 username: user.username || '',
-                items: cart.map(i => ({ name: i.name, price: i.price })),
+                items: cart.map(i => ({ name: i.name, price: i.price, quantity: 1 })),
                 total: total,
                 pointsEarned: pointsEarned,
+                pointsUsed: pointsToUse,
                 status: paymentMethod === 'cod' ? 'Pending (COD)' : 'Paid',
                 paymentMethod: paymentMethod,
                 timestamp: new Date().toISOString(),
@@ -589,16 +593,26 @@
             if (window.saveOrderToFirestore) if (!await window.saveOrderToFirestore(order)) firestoreSuccess = false;
             if (window.updateUserPointsInFirestore) if (!await window.updateUserPointsInFirestore(user.id, loyaltyPoints)) firestoreSuccess = false;
             if (!firestoreSuccess) showToast("⚠️ Order saved locally but cloud sync failed.");
+            
             let orderDataForBot = {
-                userId: user.id, userName: user.firstName + (user.lastName ? ' ' + user.lastName : ''),
-                username: user.username || '', firstName: user.firstName, lastName: user.lastName || '',
-                items: cart.map(i => ({ name: i.name, price: i.price })),
-                total: total.toFixed(2), points: pointsEarned, totalPoints: loyaltyPoints,
-                timestamp: cambodiaTime, discount: appliedDiscount, promo: appliedPromoCode,
-                paymentMethod: paymentMethod
+                userId: user.id,
+                userName: user.firstName + (user.lastName ? ' ' + user.lastName : ''),
+                username: user.username || '',
+                firstName: user.firstName,
+                lastName: user.lastName || '',
+                items: cart.map(i => ({ name: i.name, price: i.price, quantity: 1 })),
+                total: total.toFixed(2),
+                points: pointsEarned,
+                totalPoints: loyaltyPoints,
+                timestamp: cambodiaTime,
+                discount: appliedDiscount,
+                promo: appliedPromoCode,
+                paymentMethod: paymentMethod,
+                sendInvoiceImmediately: (paymentMethod !== 'cod')
             };
+            
             cart = [];
-            appliedDiscount = 0; appliedPromoCode = null; redeemedPointsUsed = 0;
+            appliedDiscount = 0; appliedPromoCode = null; pointsToUse = 0; pointsDiscount = 0;
             updateCartCount(); updateCartDisplay(); updateProfileInfo(); saveData();
             tg.sendData(JSON.stringify(orderDataForBot));
             let methodText = paymentMethod === 'cod' ? 'Cash on Delivery' : 'Card';
@@ -617,6 +631,27 @@
         async function handleCodPayment() {
             await completeOrder('cod');
             closePaymentModal();
+        }
+
+        async function downloadInvoice(orderId) {
+            try {
+                const response = await fetch(`/api/invoice/${orderId}`);
+                if (response.ok) {
+                    const blob = await response.blob();
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `invoice_${orderId}.pdf`;
+                    a.click();
+                    URL.revokeObjectURL(url);
+                } else {
+                    const error = await response.json();
+                    tg.showAlert(error.error || "Invoice not available yet. Seller will send it after payment.");
+                }
+            } catch (err) {
+                console.error("Download failed:", err);
+                tg.showAlert("Failed to download invoice.");
+            }
         }
 
         // Reviews
@@ -675,7 +710,11 @@
             else showToast(translations[currentLang].reviewFailed);
         }
 
-        // Render Menu
+        async function loadAndRenderMenu() {
+            menuItems = await window.loadProducts();
+            renderMenu();
+        }
+
         function renderMenu() {
             let grid = document.getElementById('menuGrid');
             let loader = document.getElementById('menuLoader');
@@ -687,7 +726,7 @@
                 if (filtered.length === 0) { grid.innerHTML = '<div style="text-align:center; padding:40px;">No items</div>'; return; }
                 grid.innerHTML = filtered.map(item => {
                     let imgHtml = (item.image && item.image.startsWith('http')) ? `<img src="${item.image}" onerror="this.parentElement.innerHTML='🍽️'">` : '🍽️';
-                    return `<div class="menu-item"><div class="item-image">${imgHtml}</div><div class="item-details"><div class="item-header"><span class="item-name">${item.name}</span><span class="item-price">$${item.price}</span></div><div class="item-description">${item.description}</div><div class="review-summary" id="review-summary-${item.id}"><span class="stars">☆☆☆☆☆</span><span>(0 reviews)</span><button class="write-review-btn" onclick="openReviewModal(${item.id}, '${item.name.replace(/'/g, "\\'")}')">${translations[currentLang].writeReview}</button></div><div class="item-controls"><div class="quantity-controls"><button class="qty-btn" onclick="adjustQuantity(${item.id}, -1)">-</button><span class="qty-value" id="qty_${item.id}">0</span><button class="qty-btn" onclick="adjustQuantity(${item.id}, 1)">+</button></div><button class="add-btn" onclick="addToCart(${item.id})">Add • $${item.price}</button></div></div></div>`;
+                    return `<div class="menu-item"><div class="item-image">${imgHtml}</div><div class="item-details"><div class="item-header"><span class="item-name">${item.name}</span><span class="item-price">$${item.price}</span></div><div class="item-description">${item.description || ''}</div><div class="review-summary" id="review-summary-${item.id}"><span class="stars">☆☆☆☆☆</span><span>(0 reviews)</span><button class="write-review-btn" onclick="openReviewModal(${item.id}, '${item.name.replace(/'/g, "\\'")}')">${translations[currentLang].writeReview}</button></div><div class="item-controls"><div class="quantity-controls"><button class="qty-btn" onclick="adjustQuantity(${item.id}, -1)">-</button><span class="qty-value" id="qty_${item.id}">0</span><button class="qty-btn" onclick="adjustQuantity(${item.id}, 1)">+</button></div><button class="add-btn" onclick="addToCart(${item.id})">Add • $${item.price}</button></div></div></div>`;
                 }).join('');
                 for (let item of filtered) await updateReviewSummary(item.id, `review-summary-${item.id}`);
             }, 200);
@@ -706,7 +745,10 @@
                     Total: $${o.total.toFixed(2)}<br>
                     ${t.orderStatusPrefix}${o.status}<br>
                     Earned ${o.pointsEarned} ${t.pointsLabel}<br>
-                    <button onclick="openChatModal('${o.id}', '${user.firstName}')" style="margin-top:8px; background:var(--primary); color:white; border:none; padding:6px 12px; border-radius:20px;">💬 Chat with Seller</button>
+                    <div style="margin-top:8px;">
+                        <button onclick="downloadInvoice('${o.id}')" style="background:var(--primary); color:white; border:none; padding:6px 12px; border-radius:20px;">📄 Download Invoice</button>
+                        <button onclick="openChatModal('${o.id}', '${user.firstName}')" style="background:var(--primary); color:white; border:none; padding:6px 12px; border-radius:20px;">💬 Chat with Seller</button>
+                    </div>
                 </div>
             `).join('');
         }
@@ -800,7 +842,8 @@
                     else { let so = localStorage.getItem(`orders_${user.id}`); if (so) orderHistory = JSON.parse(so); }
                 } catch(e) { let so = localStorage.getItem(`orders_${user.id}`); if (so) orderHistory = JSON.parse(so); }
             } else { let so = localStorage.getItem(`orders_${user.id}`); if (so) orderHistory = JSON.parse(so); }
-            renderMenu(); updateProfileInfo();
+            await loadAndRenderMenu();
+            updateProfileInfo();
             if (window.listenToUserPoints && user.id) {
                 if (unsubscribePoints) unsubscribePoints();
                 unsubscribePoints = window.listenToUserPoints(user.id, (newPoints) => {
@@ -816,11 +859,12 @@
             }));
             document.getElementById('submitReviewBtn').onclick = submitReviewHandler;
             document.getElementById('applyPromoBtn').onclick = applyPromoCode;
-            document.getElementById('redeemPointsBtn').onclick = redeemPoints;
             document.getElementById('mockPayBtn').onclick = handleCardPayment;
             document.getElementById('codPayBtn').onclick = handleCodPayment;
             document.getElementById('proceedPaymentBtn').onclick = proceedToPayment;
             document.getElementById('sendChatBtn').onclick = sendChatMessage;
+            const slider = document.getElementById('pointsSlider');
+            slider.oninput = updatePointsDisplay;
             applyLanguage(currentLang);
         }
 
