@@ -242,8 +242,9 @@
             } catch(e) { return false; }
         };
         
-        // ========== LOAD PRODUCTS FROM FIRESTORE ==========
+        // ========== LOAD PRODUCTS FROM FIRESTORE (FIXED) ==========
         window.loadProducts = async function() {
+            console.log("loadProducts called");
             try {
                 const q = query(collection(db, "products"), orderBy("id"));
                 const snapshot = await getDocs(q);
@@ -251,12 +252,14 @@
                 snapshot.forEach(doc => {
                     products.push({ docId: doc.id, ...doc.data() });
                 });
+                console.log(`Loaded ${products.length} products from Firestore`);
                 return products;
             } catch(e) {
                 console.error("Failed to load products:", e);
                 return [];
             }
         };
+        // ============================================================
         
         console.log("Firebase ready");
     </script>
@@ -861,6 +864,7 @@
 
         // ==================== START APP ====================
         async function startApp() {
+            console.log("startApp called");
             document.getElementById('userInfo').textContent = `${translations[currentLang].welcomePrefix}${user.firstName}!`;
             if (user.photoUrl) document.getElementById('profileAvatar').innerHTML = `<img src="${user.photoUrl}" style="width:100%; border-radius:50%;">`;
             loadSavedCart();
