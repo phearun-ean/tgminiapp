@@ -242,7 +242,6 @@
             } catch(e) { return false; }
         };
         
-        // ========== LOAD PRODUCTS FROM FIRESTORE (FIXED) ==========
         window.loadProducts = async function() {
             console.log("loadProducts called");
             try {
@@ -259,7 +258,6 @@
                 return [];
             }
         };
-        // ============================================================
         
         console.log("Firebase ready");
     </script>
@@ -341,37 +339,72 @@
             currentLang = lang;
             localStorage.setItem('app_lang', lang);
             const t = translations[lang];
-            document.getElementById('siteTitle').innerText = t.siteTitle;
-            document.getElementById('subtitle').innerText = t.subtitle;
-            document.getElementById('standards').innerText = t.standards;
-            document.getElementById('tabMenu').innerText = t.tabMenu;
-            document.getElementById('tabCart').innerHTML = t.tabCart + ' <span id="cartTabCount" class="hidden">(0)</span>';
-            document.getElementById('tabProfile').innerText = t.tabProfile;
-            document.getElementById('loyaltyTitle').innerText = t.loyaltyTitle;
-            document.getElementById('loyaltyDesc').innerText = t.loyaltyDesc;
-            document.getElementById('catAll').innerText = t.catAll;
-            document.getElementById('catPromo').innerHTML = t.catPromo;
-            document.getElementById('catDrinks').innerHTML = t.catDrinks;
-            document.getElementById('catDried').innerHTML = t.catDried;
-            document.getElementById('emptyCartMsg').innerHTML = `🛒<p>${t.emptyCart}</p>`;
-            document.getElementById('pointsLabel').innerText = t.pointsLabel;
-            document.getElementById('orderHistoryTitle').innerText = t.orderHistoryTitle;
-            document.getElementById('subtotalLabel').innerText = t.subtotalLabel;
-            document.getElementById('discountLabel').innerText = t.discountLabel;
-            document.getElementById('totalLabel').innerText = t.totalLabel;
-            document.getElementById('promoCodeInput').placeholder = t.promoPlaceholder;
-            document.getElementById('applyPromoBtn').innerText = t.applyPromo;
-            document.getElementById('proceedPaymentBtn').innerText = t.proceedPayment;
-            document.getElementById('reviewModalTitle').innerText = t.reviewModalTitle;
-            document.getElementById('reviewComment').placeholder = t.reviewPlaceholder;
-            document.getElementById('submitReviewBtn').innerText = t.submitReview;
-            document.getElementById('paymentModalTitle').innerText = t.paymentModalTitle;
-            document.getElementById('paymentTotalText').innerHTML = t.paymentTotalText + '<span id="paymentAmount">0.00</span>';
-            document.getElementById('mockPayBtn').innerText = t.cardPay;
-            document.getElementById('codPayBtn').innerText = t.codPay;
+            
+            // Safe element updates with null checks
+            const elements = {
+                siteTitle: document.getElementById('siteTitle'),
+                subtitle: document.getElementById('subtitle'),
+                standards: document.getElementById('standards'),
+                tabMenu: document.getElementById('tabMenu'),
+                tabCart: document.getElementById('tabCart'),
+                tabProfile: document.getElementById('tabProfile'),
+                loyaltyTitle: document.getElementById('loyaltyTitle'),
+                loyaltyDesc: document.getElementById('loyaltyDesc'),
+                catAll: document.getElementById('catAll'),
+                catPromo: document.getElementById('catPromo'),
+                catDrinks: document.getElementById('catDrinks'),
+                catDried: document.getElementById('catDried'),
+                emptyCartMsg: document.getElementById('emptyCartMsg'),
+                pointsLabel: document.getElementById('pointsLabel'),
+                orderHistoryTitle: document.getElementById('orderHistoryTitle'),
+                subtotalLabel: document.getElementById('subtotalLabel'),
+                discountLabel: document.getElementById('discountLabel'),
+                totalLabel: document.getElementById('totalLabel'),
+                promoCodeInput: document.getElementById('promoCodeInput'),
+                applyPromoBtn: document.getElementById('applyPromoBtn'),
+                proceedPaymentBtn: document.getElementById('proceedPaymentBtn'),
+                reviewModalTitle: document.getElementById('reviewModalTitle'),
+                reviewComment: document.getElementById('reviewComment'),
+                submitReviewBtn: document.getElementById('submitReviewBtn'),
+                paymentModalTitle: document.getElementById('paymentModalTitle'),
+                paymentTotalText: document.getElementById('paymentTotalText'),
+                mockPayBtn: document.getElementById('mockPayBtn'),
+                codPayBtn: document.getElementById('codPayBtn')
+            };
+            
+            if (elements.siteTitle) elements.siteTitle.innerText = t.siteTitle;
+            if (elements.subtitle) elements.subtitle.innerText = t.subtitle;
+            if (elements.standards) elements.standards.innerText = t.standards;
+            if (elements.tabMenu) elements.tabMenu.innerText = t.tabMenu;
+            if (elements.tabCart) elements.tabCart.innerHTML = t.tabCart + ' <span id="cartTabCount" class="hidden">(0)</span>';
+            if (elements.tabProfile) elements.tabProfile.innerText = t.tabProfile;
+            if (elements.loyaltyTitle) elements.loyaltyTitle.innerText = t.loyaltyTitle;
+            if (elements.loyaltyDesc) elements.loyaltyDesc.innerText = t.loyaltyDesc;
+            if (elements.catAll) elements.catAll.innerText = t.catAll;
+            if (elements.catPromo) elements.catPromo.innerHTML = t.catPromo;
+            if (elements.catDrinks) elements.catDrinks.innerHTML = t.catDrinks;
+            if (elements.catDried) elements.catDried.innerHTML = t.catDried;
+            if (elements.emptyCartMsg) elements.emptyCartMsg.innerHTML = `🛒<p>${t.emptyCart}</p>`;
+            if (elements.pointsLabel) elements.pointsLabel.innerText = t.pointsLabel;
+            if (elements.orderHistoryTitle) elements.orderHistoryTitle.innerText = t.orderHistoryTitle;
+            if (elements.subtotalLabel) elements.subtotalLabel.innerText = t.subtotalLabel;
+            if (elements.discountLabel) elements.discountLabel.innerText = t.discountLabel;
+            if (elements.totalLabel) elements.totalLabel.innerText = t.totalLabel;
+            if (elements.promoCodeInput) elements.promoCodeInput.placeholder = t.promoPlaceholder;
+            if (elements.applyPromoBtn) elements.applyPromoBtn.innerText = t.applyPromo;
+            if (elements.proceedPaymentBtn) elements.proceedPaymentBtn.innerText = t.proceedPayment;
+            if (elements.reviewModalTitle) elements.reviewModalTitle.innerText = t.reviewModalTitle;
+            if (elements.reviewComment) elements.reviewComment.placeholder = t.reviewPlaceholder;
+            if (elements.submitReviewBtn) elements.submitReviewBtn.innerText = t.submitReview;
+            if (elements.paymentModalTitle) elements.paymentModalTitle.innerText = t.paymentModalTitle;
+            if (elements.paymentTotalText) elements.paymentTotalText.innerHTML = t.paymentTotalText + '<span id="paymentAmount">0.00</span>';
+            if (elements.mockPayBtn) elements.mockPayBtn.innerText = t.cardPay;
+            if (elements.codPayBtn) elements.codPayBtn.innerText = t.codPay;
+            
             if (typeof updateProfileInfo === 'function') updateProfileInfo();
             if (typeof updateCartDisplay === 'function') updateCartDisplay();
             if (typeof renderMenu === 'function') renderMenu();
+            
             document.querySelectorAll('.lang-btn').forEach(btn => {
                 if (btn.dataset.lang === lang) btn.classList.add('active');
                 else btn.classList.remove('active');
@@ -865,8 +898,13 @@
         // ==================== START APP ====================
         async function startApp() {
             console.log("startApp called");
+            
+            // Apply language FIRST to ensure all elements exist
+            applyLanguage(currentLang);
+            
             document.getElementById('userInfo').textContent = `${translations[currentLang].welcomePrefix}${user.firstName}!`;
             if (user.photoUrl) document.getElementById('profileAvatar').innerHTML = `<img src="${user.photoUrl}" style="width:100%; border-radius:50%;">`;
+            
             loadSavedCart();
             if (window.loadUserPointsFromFirestore && user.id) {
                 let fp = await window.loadUserPointsFromFirestore(user.id);
@@ -902,8 +940,7 @@
             document.getElementById('proceedPaymentBtn').onclick = proceedToPayment;
             document.getElementById('sendChatBtn').onclick = sendChatMessage;
             const slider = document.getElementById('pointsSlider');
-            slider.oninput = updatePointsDisplay;
-            applyLanguage(currentLang);
+            if (slider) slider.oninput = updatePointsDisplay;
         }
 
         if (user.id !== 'guest') startApp();
