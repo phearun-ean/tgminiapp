@@ -758,73 +758,93 @@
 
         // ========== LOAD MENU FROM FIRESTORE ==========
         async function loadAndRenderMenu() {
-            console.log("loadAndRenderMenu called");
+    console.log("loadAndRenderMenu called");
+    
+    // Wait a moment for Firebase to fully initialize
+    await new Promise(resolve => setTimeout(resolve, 500));
+    
+    // Try to load from Firestore
+    let productsLoaded = false;
+    
+    if (window.loadProducts) {
+        try {
+            console.log("Calling window.loadProducts...");
+            const firestoreProducts = await window.loadProducts();
+            console.log("Firestore products received:", firestoreProducts);
             
-            if (window.loadProducts) {
-                try {
-                    const firestoreProducts = await window.loadProducts();
-                    console.log("Firestore products received:", firestoreProducts);
-                    
-                    if (firestoreProducts && firestoreProducts.length > 0) {
-                        menuItems = firestoreProducts;
-                        console.log(`✅ Loaded ${menuItems.length} products from Firestore`);
-                        renderMenu();
-                        return;
-                    } else {
-                        console.log("Firestore returned empty array");
-                    }
-                } catch(e) {
-                    console.error("Error loading from Firestore:", e);
-                }
+            if (firestoreProducts && firestoreProducts.length > 0) {
+                menuItems = firestoreProducts;
+                productsLoaded = true;
+                console.log(`✅ Loaded ${menuItems.length} products from Firestore`);
+            } else {
+                console.log("Firestore returned empty array");
             }
-            
-            // Fallback products (only if Firestore fails)
-            console.log("Using fallback products");
-            menuItems = [
-                { id: 1, name: "Bird Nest 75ml (general)", description: "100% pure bird's nests, ready to drink", price: 5, category: "bird nest drinks", image: "https://i.postimg.cc/rw3v9gyK/75ml.png" },
-                { id: 2, name: "Bird Nest 75ml (6 bottles)", description: "100% pure bird's nests", price: 30, category: "bird nest drinks", image: "https://i.postimg.cc/Dw89sRhZ/75ml_6bottle.png" },
-                { id: 3, name: "Bird Nest 75ml (6 bottles original)", description: "Original taste", price: 30, category: "bird nest drinks", image: "https://i.postimg.cc/vZcJ9Cyc/75ml_6bottle_original.png" },
-                { id: 4, name: "Bird Nest 75ml (diabetic)", description: "No added sugar", price: 5, category: "bird nest drinks", image: "https://i.postimg.cc/vZcJ9Cyc/75ml_6bottle_original.png" },
-                { id: 5, name: "Bird Nest 75ml (6 bottles diabetic)", description: "Diabetic-friendly", price: 30, category: "bird nest drinks", image: "https://i.postimg.cc/vZcJ9Cyc/75ml_6bottle_original.png" },
-                { id: 6, name: "Bird Nest 100ml", description: "100% pure", price: 10, category: "bird nest drinks", image: "https://i.postimg.cc/XYpRFtW7/100ml.png" },
-                { id: 7, name: "Bird Nest 150ml", description: "100% pure", price: 12, category: "bird nest drinks", image: "https://i.postimg.cc/htfkxNnQ/150ml.png" },
-                { id: 8, name: "Bird Nest 200ml", description: "100% pure", price: 15, category: "bird nest drinks", image: "https://i.postimg.cc/8s8mhCxR/200ml.png" },
-                { id: 9, name: "Bird Nest 250ml", description: "100% pure", price: 20, category: "bird nest drinks", image: "https://i.postimg.cc/PNGQmq0m/250ml.png" },
-                { id: 10, name: "Bird Nest 500ml", description: "100% pure", price: 50, category: "bird nest drinks", image: "https://i.postimg.cc/ZqZH0ChV/500ml.png" },
-                { id: 11, name: "Bird Nest 1000ml", description: "100% pure", price: 100, category: "bird nest drinks", image: "https://i.postimg.cc/Wb1Pq1sV/1000ml.png" },
-                { id: 12, name: "Bird Nest Grade A (100g)", description: "Dried, shelf-life 3 years", price: 290, category: "Dried bird nest", image: "https://i.postimg.cc/Pq6bSyBf/Grade_A.png" },
-                { id: 13, name: "Bird Nest Konkat (100g)", description: "Dried high quality", price: 250, category: "Dried bird nest", image: "https://i.postimg.cc/zXWNCP93/Konkat.png" },
-                { id: 14, name: "Bird Nest Num (100g)", description: "Dried", price: 180, category: "Dried bird nest", image: "https://i.postimg.cc/sXwxR035/Bird_s_Nest_Num1_100g.png" },
-                { id: 15, name: "Bird Nest Princess (100g)", description: "Premium dried", price: 200, category: "Dried bird nest", image: "" }
-            ];
-            renderMenu();
+        } catch(e) {
+            console.error("Error loading from Firestore:", e);
         }
+    } else {
+        console.log("window.loadProducts not available yet");
+    }
+    
+    // If Firestore failed or returned nothing, use fallback
+    if (!productsLoaded) {
+        console.log("Using fallback products");
+        menuItems = [
+            { id: 1, name: "Bird Nest 75ml (general)", description: "100% pure bird's nests, ready to drink", price: 5, category: "bird nest drinks", image: "https://i.postimg.cc/rw3v9gyK/75ml.png" },
+            { id: 2, name: "Bird Nest 75ml (6 bottles)", description: "100% pure bird's nests", price: 30, category: "bird nest drinks", image: "https://i.postimg.cc/Dw89sRhZ/75ml_6bottle.png" },
+            { id: 3, name: "Bird Nest 75ml (6 bottles original)", description: "Original taste", price: 30, category: "bird nest drinks", image: "https://i.postimg.cc/vZcJ9Cyc/75ml_6bottle_original.png" },
+            { id: 4, name: "Bird Nest 75ml (diabetic)", description: "No added sugar", price: 5, category: "bird nest drinks", image: "https://i.postimg.cc/vZcJ9Cyc/75ml_6bottle_original.png" },
+            { id: 5, name: "Bird Nest 75ml (6 bottles diabetic)", description: "Diabetic-friendly", price: 30, category: "bird nest drinks", image: "https://i.postimg.cc/vZcJ9Cyc/75ml_6bottle_original.png" },
+            { id: 6, name: "Bird Nest 100ml", description: "100% pure", price: 10, category: "bird nest drinks", image: "https://i.postimg.cc/XYpRFtW7/100ml.png" },
+            { id: 7, name: "Bird Nest 150ml", description: "100% pure", price: 12, category: "bird nest drinks", image: "https://i.postimg.cc/htfkxNnQ/150ml.png" },
+            { id: 8, name: "Bird Nest 200ml", description: "100% pure", price: 15, category: "bird nest drinks", image: "https://i.postimg.cc/8s8mhCxR/200ml.png" },
+            { id: 9, name: "Bird Nest 250ml", description: "100% pure", price: 20, category: "bird nest drinks", image: "https://i.postimg.cc/PNGQmq0m/250ml.png" },
+            { id: 10, name: "Bird Nest 500ml", description: "100% pure", price: 50, category: "bird nest drinks", image: "https://i.postimg.cc/ZqZH0ChV/500ml.png" },
+            { id: 11, name: "Bird Nest 1000ml", description: "100% pure", price: 100, category: "bird nest drinks", image: "https://i.postimg.cc/Wb1Pq1sV/1000ml.png" },
+            { id: 12, name: "Bird Nest Grade A (100g)", description: "Dried, shelf-life 3 years", price: 290, category: "Dried bird nest", image: "https://i.postimg.cc/Pq6bSyBf/Grade_A.png" },
+            { id: 13, name: "Bird Nest Konkat (100g)", description: "Dried high quality", price: 250, category: "Dried bird nest", image: "https://i.postimg.cc/zXWNCP93/Konkat.png" },
+            { id: 14, name: "Bird Nest Num (100g)", description: "Dried", price: 180, category: "Dried bird nest", image: "https://i.postimg.cc/sXwxR035/Bird_s_Nest_Num1_100g.png" },
+            { id: 15, name: "Bird Nest Princess (100g)", description: "Premium dried", price: 200, category: "Dried bird nest", image: "" }
+        ];
+    }
+    
+    renderMenu();
+}
+        
 
         function renderMenu() {
-            console.log("renderMenu called, menuItems length:", menuItems.length);
-            
-            let grid = document.getElementById('menuGrid');
-            let loader = document.getElementById('menuLoader');
-            loader.classList.remove('hidden');
-            if (renderTimeout) clearTimeout(renderTimeout);
-            renderTimeout = setTimeout(async () => {
-                loader.classList.add('hidden');
-                
-                let filtered = currentCategory === 'all' ? menuItems : menuItems.filter(i => i.category === currentCategory);
-                console.log("Filtered products:", filtered.length);
-                
-                if (filtered.length === 0) { 
-                    grid.innerHTML = '<div style="text-align:center; padding:40px;">No items found. Add products in inventory.</div>'; 
-                    return; 
-                }
-                
-                grid.innerHTML = filtered.map(item => {
-                    let imgHtml = (item.image && item.image.startsWith('http')) ? `<img src="${item.image}" onerror="this.parentElement.innerHTML='🍽️'">` : '🍽️';
-                    return `<div class="menu-item"><div class="item-image">${imgHtml}</div><div class="item-details"><div class="item-header"><span class="item-name">${item.name}</span><span class="item-price">$${item.price}</span></div><div class="item-description">${item.description || ''}</div><div class="review-summary" id="review-summary-${item.id}"><span class="stars">☆☆☆☆☆</span><span>(0 reviews)</span><button class="write-review-btn" onclick="openReviewModal(${item.id}, '${item.name.replace(/'/g, "\\'")}')">${translations[currentLang].writeReview}</button></div><div class="item-controls"><div class="quantity-controls"><button class="qty-btn" onclick="adjustQuantity(${item.id}, -1)">-</button><span class="qty-value" id="qty_${item.id}">0</span><button class="qty-btn" onclick="adjustQuantity(${item.id}, 1)">+</button></div><button class="add-btn" onclick="addToCart(${item.id})">Add • $${item.price}</button></div></div></div>`;
-                }).join('');
-                
-                for (let item of filtered) await updateReviewSummary(item.id, `review-summary-${item.id}`);
-            }, 200);
+    console.log("renderMenu called, menuItems length:", menuItems.length);
+    
+    let grid = document.getElementById('menuGrid');
+    let loader = document.getElementById('menuLoader');
+    
+    // Show loader only if menuItems is empty and we're still loading
+    if (menuItems.length === 0) {
+        loader.classList.remove('hidden');
+        grid.innerHTML = '<div style="text-align:center; padding:40px;">Loading products...</div>';
+        return;
+    }
+    
+    loader.classList.remove('hidden');
+    if (renderTimeout) clearTimeout(renderTimeout);
+    renderTimeout = setTimeout(async () => {
+        loader.classList.add('hidden');
+        
+        let filtered = currentCategory === 'all' ? menuItems : menuItems.filter(i => i.category === currentCategory);
+        console.log("Filtered products:", filtered.length);
+        
+        if (filtered.length === 0) { 
+            grid.innerHTML = '<div style="text-align:center; padding:40px;">No items found. Add products in inventory.</div>'; 
+            return; 
+        }
+        
+        grid.innerHTML = filtered.map(item => {
+            let imgHtml = (item.image && item.image.startsWith('http')) ? `<img src="${item.image}" onerror="this.parentElement.innerHTML='🍽️'">` : '🍽️';
+            return `<div class="menu-item"><div class="item-image">${imgHtml}</div><div class="item-details"><div class="item-header"><span class="item-name">${item.name}</span><span class="item-price">$${item.price}</span></div><div class="item-description">${item.description || ''}</div><div class="review-summary" id="review-summary-${item.id}"><span class="stars">☆☆☆☆☆</span><span>(0 reviews)</span><button class="write-review-btn" onclick="openReviewModal(${item.id}, '${item.name.replace(/'/g, "\\'")}')">${translations[currentLang].writeReview}</button></div><div class="item-controls"><div class="quantity-controls"><button class="qty-btn" onclick="adjustQuantity(${item.id}, -1)">-</button><span class="qty-value" id="qty_${item.id}">0</span><button class="qty-btn" onclick="adjustQuantity(${item.id}, 1)">+</button></div><button class="add-btn" onclick="addToCart(${item.id})">Add • $${item.price}</button></div></div></div>`;
+        }).join('');
+        
+        for (let item of filtered) await updateReviewSummary(item.id, `review-summary-${item.id}`);
+    }, 200);
         }
 
         function updateProfileInfo() {
