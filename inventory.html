@@ -2,7 +2,6 @@
 <html>
 <head>
     <title>Inventory Manager - Bird Nest House</title>
-    <!-- Load Firebase SDKs as scripts (not modules) -->
     <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-auth-compat.js"></script>
@@ -119,12 +118,14 @@
                 const snapshot = await db.collection("products").orderBy("id").get();
                 products = [];
                 snapshot.forEach(doc => {
-                    products.push({ id: doc.id, ...doc.data() });
+                    const productData = doc.data();
+                    productData.docId = doc.id;  // Store the Firestore document ID
+                    products.push(productData);
                 });
                 displayProducts();
             } catch (error) {
                 console.error("Error loading products:", error);
-                container.innerHTML = '<p style="color:red;">Error loading products. Make sure you are logged in and have permission.</p>';
+                container.innerHTML = '<p style="color:red;">Error loading products: ' + error.message + '</p>';
             }
         }
         
@@ -136,24 +137,25 @@
                 return;
             }
             
-            let html = '<tr><th>ID</th><th>Name</th><th>Price</th><th>Category</th><th>Stock</th><th>Actions</th></tr>';
+            let html = '<table><th>ID</th><th>Name</th><th>Price</th><th>Category</th><th>Stock</th><th>Actions</th></tr>';
             products.forEach(p => {
+                const docId = p.docId;
                 html += `
                     <tr>
                         <td>${p.id}</td>
-                        <td><input type="text" id="name_${p.id}" value="${escapeHtml(p.name)}" style="width:150px;" autocomplete="off"></td>
-                        <td><input type="number" id="price_${p.id}" value="${p.price}" step="0.01" style="width:80px;" autocomplete="off"></td>
+                        <td><input type="text" id="name_${docId}" value="${escapeHtml(p.name)}" style="width:150px;" autocomplete="off"></td>
+                        <td><input type="number" id="price_${docId}" value="${p.price}" step="0.01" style="width:80px;" autocomplete="off"></td>
                         <td>
-                            <select id="cat_${p.id}" autocomplete="off">
+                            <select id="cat_${docId}" autocomplete="off">
                                 <option ${p.category === 'bird nest drinks' ? 'selected' : ''} value="bird nest drinks">🥤 Bird Nest Drinks</option>
                                 <option ${p.category === 'Dried bird nest' ? 'selected' : ''} value="Dried bird nest">🥚 Dried Bird Nest</option>
                                 <option ${p.category === 'Promotions' ? 'selected' : ''} value="Promotions">🎁 Promotions</option>
                             </select>
                         </td>
-                        <td><input type="number" id="stock_${p.id}" value="${p.stock || 0}" style="width:60px;" autocomplete="off"></td>
+                        <td><input type="number" id="stock_${docId}" value="${p.stock || 0}" style="width:60px;" autocomplete="off"></td>
                         <td>
-                            <button onclick="updateProduct('${p.id}')">💾 Save</button>
-                            <button onclick="deleteProduct('${p.id}')">🗑️ Delete</button>
+                            <button onclick="updateProduct('${docId}')">💾 Save</button>
+                            <button onclick="deleteProduct('${docId}')">🗑️ Delete</button>
                         </td>
                     </tr>
                 `;
@@ -176,7 +178,11 @@
                 return;
             }
             
-            const maxId = products.length > 0 ? Math.max(...products.map(p => p.id)) : 0;
+            // Find the highest existing numeric ID
+            let maxId = 0;
+            products.forEach(p => {
+                if (p.id && p.id > maxId) maxId = p.id;
+            });
             const newId = maxId + 1;
             
             try {
