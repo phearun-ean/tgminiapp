@@ -249,7 +249,18 @@
                 const snapshot = await getDocs(q);
                 const products = [];
                 snapshot.forEach(doc => {
-                    products.push({ docId: doc.id, ...doc.data() });
+                    const data = doc.data();
+                    console.log("Found product:", data.id, data.name, data.category);
+                    products.push({ 
+                        docId: doc.id, 
+                        id: data.id,
+                        name: data.name,
+                        price: data.price,
+                        description: data.description || '',
+                        category: data.category || 'bird nest drinks',
+                        image: data.image || '',
+                        stock: data.stock || 0
+                    });
                 });
                 console.log(`Loaded ${products.length} products from Firestore`);
                 return products;
@@ -340,7 +351,6 @@
             localStorage.setItem('app_lang', lang);
             const t = translations[lang];
             
-            // Safe element updates with null checks
             const elements = {
                 siteTitle: document.getElementById('siteTitle'),
                 subtitle: document.getElementById('subtitle'),
@@ -746,42 +756,52 @@
             else showToast(translations[currentLang].reviewFailed);
         }
 
-        // ========== LOAD MENU WITH FALLBACK ==========
+        // ========== LOAD MENU FROM FIRESTORE FIRST ==========
         async function loadAndRenderMenu() {
-            // Fallback hardcoded products (works immediately)
-            const hardcodedProducts = [
-                { id: 1, name: "Bird Nest 75ml (general)", description: "100% pure bird's nests, ready to drink", price: 5, category: "bird nest drinks", image: "https://i.postimg.cc/rw3v9gyK/75ml.png" },
-                { id: 2, name: "Bird Nest 75ml (6 bottles)", description: "100% pure bird's nests", price: 30, category: "bird nest drinks", image: "https://i.postimg.cc/Dw89sRhZ/75ml_6bottle.png" },
-                { id: 3, name: "Bird Nest 75ml (6 bottles original)", description: "Original taste", price: 30, category: "bird nest drinks", image: "https://i.postimg.cc/vZcJ9Cyc/75ml_6bottle_original.png" },
-                { id: 4, name: "Bird Nest 75ml (diabetic)", description: "No added sugar", price: 5, category: "bird nest drinks", image: "https://i.postimg.cc/vZcJ9Cyc/75ml_6bottle_original.png" },
-                { id: 5, name: "Bird Nest 75ml (6 bottles diabetic)", description: "Diabetic-friendly", price: 30, category: "bird nest drinks", image: "https://i.postimg.cc/vZcJ9Cyc/75ml_6bottle_original.png" },
-                { id: 6, name: "Bird Nest 100ml", description: "100% pure", price: 10, category: "bird nest drinks", image: "https://i.postimg.cc/XYpRFtW7/100ml.png" },
-                { id: 7, name: "Bird Nest 150ml", description: "100% pure", price: 12, category: "bird nest drinks", image: "https://i.postimg.cc/htfkxNnQ/150ml.png" },
-                { id: 8, name: "Bird Nest 200ml", description: "100% pure", price: 15, category: "bird nest drinks", image: "https://i.postimg.cc/8s8mhCxR/200ml.png" },
-                { id: 9, name: "Bird Nest 250ml", description: "100% pure", price: 20, category: "bird nest drinks", image: "https://i.postimg.cc/PNGQmq0m/250ml.png" },
-                { id: 10, name: "Bird Nest 500ml", description: "100% pure", price: 50, category: "bird nest drinks", image: "https://i.postimg.cc/ZqZH0ChV/500ml.png" },
-                { id: 11, name: "Bird Nest 1000ml", description: "100% pure", price: 100, category: "bird nest drinks", image: "https://i.postimg.cc/Wb1Pq1sV/1000ml.png" },
-                { id: 12, name: "Bird Nest Grade A (100g)", description: "Dried, shelf-life 3 years", price: 290, category: "Dried bird nest", image: "https://i.postimg.cc/Pq6bSyBf/Grade_A.png" },
-                { id: 13, name: "Bird Nest Konkat (100g)", description: "Dried high quality", price: 250, category: "Dried bird nest", image: "https://i.postimg.cc/zXWNCP93/Konkat.png" },
-                { id: 14, name: "Bird Nest Num (100g)", description: "Dried", price: 180, category: "Dried bird nest", image: "https://i.postimg.cc/sXwxR035/Bird_s_Nest_Num1_100g.png" },
-                { id: 15, name: "Bird Nest Princess (100g)", description: "Premium dried", price: 200, category: "Dried bird nest", image: "" }
-            ];
+            console.log("loadAndRenderMenu called");
             
-            menuItems = hardcodedProducts;
-            renderMenu();
+            // First try to load from Firestore
+            let productsLoaded = false;
             
-            // Then try to load from Firestore (will override if available)
             if (window.loadProducts) {
                 try {
                     const firestoreProducts = await window.loadProducts();
+                    console.log("Firestore products:", firestoreProducts);
+                    
                     if (firestoreProducts && firestoreProducts.length > 0) {
                         menuItems = firestoreProducts;
+                        console.log(`✅ Loaded ${menuItems.length} products from Firestore`);
                         renderMenu();
-                        console.log("✅ Loaded products from Firestore");
+                        productsLoaded = true;
+                    } else {
+                        console.log("Firestore returned empty products");
                     }
                 } catch(e) {
-                    console.warn("Could not load from Firestore, using hardcoded menu");
+                    console.error("Error loading from Firestore:", e);
                 }
+            }
+            
+            // If Firestore failed or returned nothing, use hardcoded fallback
+            if (!productsLoaded) {
+                console.log("Using hardcoded fallback products");
+                menuItems = [
+                    { id: 1, name: "Bird Nest 75ml (general)", description: "100% pure bird's nests, ready to drink", price: 5, category: "bird nest drinks", image: "https://i.postimg.cc/rw3v9gyK/75ml.png" },
+                    { id: 2, name: "Bird Nest 75ml (6 bottles)", description: "100% pure bird's nests", price: 30, category: "bird nest drinks", image: "https://i.postimg.cc/Dw89sRhZ/75ml_6bottle.png" },
+                    { id: 3, name: "Bird Nest 75ml (6 bottles original)", description: "Original taste", price: 30, category: "bird nest drinks", image: "https://i.postimg.cc/vZcJ9Cyc/75ml_6bottle_original.png" },
+                    { id: 4, name: "Bird Nest 75ml (diabetic)", description: "No added sugar", price: 5, category: "bird nest drinks", image: "https://i.postimg.cc/vZcJ9Cyc/75ml_6bottle_original.png" },
+                    { id: 5, name: "Bird Nest 75ml (6 bottles diabetic)", description: "Diabetic-friendly", price: 30, category: "bird nest drinks", image: "https://i.postimg.cc/vZcJ9Cyc/75ml_6bottle_original.png" },
+                    { id: 6, name: "Bird Nest 100ml", description: "100% pure", price: 10, category: "bird nest drinks", image: "https://i.postimg.cc/XYpRFtW7/100ml.png" },
+                    { id: 7, name: "Bird Nest 150ml", description: "100% pure", price: 12, category: "bird nest drinks", image: "https://i.postimg.cc/htfkxNnQ/150ml.png" },
+                    { id: 8, name: "Bird Nest 200ml", description: "100% pure", price: 15, category: "bird nest drinks", image: "https://i.postimg.cc/8s8mhCxR/200ml.png" },
+                    { id: 9, name: "Bird Nest 250ml", description: "100% pure", price: 20, category: "bird nest drinks", image: "https://i.postimg.cc/PNGQmq0m/250ml.png" },
+                    { id: 10, name: "Bird Nest 500ml", description: "100% pure", price: 50, category: "bird nest drinks", image: "https://i.postimg.cc/ZqZH0ChV/500ml.png" },
+                    { id: 11, name: "Bird Nest 1000ml", description: "100% pure", price: 100, category: "bird nest drinks", image: "https://i.postimg.cc/Wb1Pq1sV/1000ml.png" },
+                    { id: 12, name: "Bird Nest Grade A (100g)", description: "Dried, shelf-life 3 years", price: 290, category: "Dried bird nest", image: "https://i.postimg.cc/Pq6bSyBf/Grade_A.png" },
+                    { id: 13, name: "Bird Nest Konkat (100g)", description: "Dried high quality", price: 250, category: "Dried bird nest", image: "https://i.postimg.cc/zXWNCP93/Konkat.png" },
+                    { id: 14, name: "Bird Nest Num (100g)", description: "Dried", price: 180, category: "Dried bird nest", image: "https://i.postimg.cc/sXwxR035/Bird_s_Nest_Num1_100g.png" },
+                    { id: 15, name: "Bird Nest Princess (100g)", description: "Premium dried", price: 200, category: "Dried bird nest", image: "" }
+                ];
+                renderMenu();
             }
         }
 
