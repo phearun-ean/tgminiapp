@@ -27,7 +27,7 @@
     <div id="loginSection" class="login-container">
         <h2>🔐 Admin Login</h2>
         <input type="email" id="loginEmail" placeholder="Email" autocomplete="off">
-        <input type="password" id="loginPassword" placeholder="Password">
+        <input type="password" id="loginPassword" placeholder="Password" autocomplete="off">
         <button onclick="login()">Login</button>
         <div id="loginMessage" style="color:red; margin-top:10px;"></div>
     </div>
@@ -38,16 +38,16 @@
         
         <div class="add-form">
             <h3>Add New Product</h3>
-            <input type="text" id="name" placeholder="Product Name" size="30">
-            <input type="number" id="price" placeholder="Price" step="0.01">
-            <input type="text" id="description" placeholder="Description" size="40">
-            <select id="category">
+            <input type="text" id="name" placeholder="Product Name" size="30" autocomplete="off">
+            <input type="number" id="price" placeholder="Price" step="0.01" autocomplete="off">
+            <input type="text" id="description" placeholder="Description" size="40" autocomplete="off">
+            <select id="category" autocomplete="off">
                 <option value="bird nest drinks">🥤 Bird Nest Drinks</option>
                 <option value="Dried bird nest">🥚 Dried Bird Nest</option>
                 <option value="Promotions">🎁 Promotions</option>
             </select>
-            <input type="text" id="image" placeholder="Image URL" size="50">
-            <input type="number" id="stock" placeholder="Stock" value="100">
+            <input type="text" id="image" placeholder="Image URL" size="50" autocomplete="off">
+            <input type="number" id="stock" placeholder="Stock" value="100" autocomplete="off">
             <button onclick="addProduct()">➕ Add Product</button>
             <div id="message"></div>
         </div>
@@ -136,21 +136,21 @@
                 return;
             }
             
-            let html = '<table><th>ID</th><th>Name</th><th>Price</th><th>Category</th><th>Stock</th><th>Actions</th></tr>';
+            let html = '<tr><th>ID</th><th>Name</th><th>Price</th><th>Category</th><th>Stock</th><th>Actions</th></tr>';
             products.forEach(p => {
                 html += `
                     <tr>
                         <td>${p.id}</td>
-                        <td><input type="text" id="name_${p.id}" value="${escapeHtml(p.name)}" style="width:150px;"></td>
-                        <td><input type="number" id="price_${p.id}" value="${p.price}" step="0.01" style="width:80px;"></td>
+                        <td><input type="text" id="name_${p.id}" value="${escapeHtml(p.name)}" style="width:150px;" autocomplete="off"></td>
+                        <td><input type="number" id="price_${p.id}" value="${p.price}" step="0.01" style="width:80px;" autocomplete="off"></td>
                         <td>
-                            <select id="cat_${p.id}">
+                            <select id="cat_${p.id}" autocomplete="off">
                                 <option ${p.category === 'bird nest drinks' ? 'selected' : ''} value="bird nest drinks">🥤 Bird Nest Drinks</option>
                                 <option ${p.category === 'Dried bird nest' ? 'selected' : ''} value="Dried bird nest">🥚 Dried Bird Nest</option>
                                 <option ${p.category === 'Promotions' ? 'selected' : ''} value="Promotions">🎁 Promotions</option>
                             </select>
                         </td>
-                        <td><input type="number" id="stock_${p.id}" value="${p.stock || 0}" style="width:60px;"></td>
+                        <td><input type="number" id="stock_${p.id}" value="${p.stock || 0}" style="width:60px;" autocomplete="off"></td>
                         <td>
                             <button onclick="updateProduct('${p.id}')">💾 Save</button>
                             <button onclick="deleteProduct('${p.id}')">🗑️ Delete</button>
